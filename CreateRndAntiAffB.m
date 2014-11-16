@@ -39,7 +39,7 @@ for i = 1:count
     antiAffectBursts(i).endTime = endFrame/fs*1000;
     antiAffectBursts(i).fileName = randFile(1:end-4);
     
-    disp(['done with ', num2str(i)]);
+    disp(['done with this antiAffect: ', num2str(i)]);
 end
 
 end
