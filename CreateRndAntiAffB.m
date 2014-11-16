@@ -6,7 +6,7 @@ function [ antiAffectBursts ] = CreateRndAntiAffB( count, sessions, affData, win
 %   winSize: window size of randomly selected segment (in ms)
 
 
-randInd=randi(length(sessions),1,count);
+randInd=randi(length(sessions),1,count)
 sessionList=sessions(randInd);
 
 for i=1:length(sessions)
