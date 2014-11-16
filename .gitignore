@@ -9,6 +9,9 @@ minFunc/
 Sherwood/
 sherwood-classify-matlab/
 
+#Files
+temp.bin
+
 # Folder config file
 Desktop.ini
 
