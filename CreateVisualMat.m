@@ -2,7 +2,7 @@ clc
 close all
 clear all
 
-load ./Dataset/AffectBurstsSession123Cleaned
+load Dataset/AffectBurstsSession123Cleaned
 Vfs=120;
 
 visseq(length(AffectBursts)).data = [];

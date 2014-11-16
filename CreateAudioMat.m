@@ -2,7 +2,7 @@ clc
 close all
 clear all
 
-load AffectBurstsSession123Cleaned
+load Dataset/AffectBurstsSession123Cleaned
 soundseq{length(AffectBursts)} = [];
 for i = 1:length(AffectBursts)
     [y,fs] = wavread(['..\Session',AffectBursts(i).fileName(5),'\dialog\wav\',AffectBursts(i).fileName,'.wav']);
