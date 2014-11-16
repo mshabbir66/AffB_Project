@@ -2,6 +2,13 @@
 Thumbs.db
 ehthumbs.db
 
+# Folders
+Dataset/
+EXP/
+minFunc/
+Sherwood/
+sherwood-classify-matlab/
+
 # Folder config file
 Desktop.ini
 
