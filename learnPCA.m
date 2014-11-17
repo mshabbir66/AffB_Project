@@ -2,19 +2,19 @@ clear all;clc;
 
 load Dataset/visseq.mat
 
+K=12;
 
 W=[];
 for i=1:length(visseq)
     
     for k=1:length(visseq(i).data{1,3})
-        S=[];
         
         data=textscan(visseq(i).data{1,3}{k},'%f','Delimiter',' ');
         
         W=[W cell2mat(data)];
         
     end
-    
+    disp(['done with the sample ', num2str(i)]);
 end
 
 Mask =isnan(W);
