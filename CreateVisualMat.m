@@ -38,3 +38,5 @@ for i = 1:length(Samples)
     disp(['done with ', num2str(i)]);
     
 end
+
+save Dataset/visseq.mat visseq
