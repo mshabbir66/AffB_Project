@@ -9,10 +9,17 @@ for i=1:length(visseq)
     
     for k=1:length(visseq(i).data{1,3})
         
-        data=textscan(visseq(i).data{1,3}{k},'%f','Delimiter',' ');
+        S=[];
+        for j=1:55
+            data=textscan(visseq(i).data{1,3}{k},'%f',3,'Delimiter',' ');
+            S=[S cell2mat(data)];
+        end
+        W=[W S'];
         
-        W=[W cell2mat(data)];
-        
+%         data=textscan(visseq(i).data{1,3}{k},'%f','Delimiter',' ');
+%         
+%         W=[W cell2mat(data)];
+%         
     end
     disp(['done with the sample ', num2str(i)]);
 end
