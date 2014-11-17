@@ -10,7 +10,7 @@ Sherwood/
 sherwood-classify-matlab/
 
 #Files
-temp.bin
+temp.*
 *.asv
 
 # Folder config file
