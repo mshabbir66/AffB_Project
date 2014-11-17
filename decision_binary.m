@@ -7,7 +7,7 @@ clear all
 LAUGHTER = 1;
 BREATHING = 2;
 OTHER = 3;
-REJECTCLASS = 4;
+REJECT = 4;
 %}
 
 %load AffBinaryStats750ms66ol_D
@@ -30,7 +30,7 @@ trainLabel = zeros(length(LABEL),1);
 trainLabel(strcmp(LABEL,'Laughter')) = LAUGHTER;
 trainLabel(strcmp(LABEL,'Breathing')) = BREATHING;
 trainLabel(strcmp(LABEL,'Other')) = OTHER;
-trainLabel(strcmp(LABEL,'REJECTCLASS')) = REJECTCLASS;
+trainLabel(strcmp(LABEL,'REJECT')) = REJECT;
 
 
 
