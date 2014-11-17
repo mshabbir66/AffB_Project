@@ -15,24 +15,26 @@ winShift = shiftms/1000*fs;
 LAUGHTER = 1;
 BREATHING = 2;
 OTHER = 3;
-REJECTCLASS = 4;
+REJECT = 4;
 %}
 
-load ./Dataset/AffectBurstsSession123Cleaned
-load ./Dataset/seq.mat
+load AffectBurstsSession123Cleaned
+load antiAffectBursts
+load ./Dataset/soundseq.mat
 
 
+Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
 %% Feature Extraction
 idcount=1;
-AffecData = [];
-for j  = 1:length(Affseq)
+AffectData = [];
+for j  = 1:length(Samples)
     i =0;
-    while winSize+ winShift*i < length(Affseq{j})
-        MFCCs = ExtractMFCC(Affseq{j}(1+winShift*i:winSize+winShift*i),fs);
-        AffecData(end+1,:).data = MFCCs;%extract_stats(MFCCs);
-        AffecData(end,:).id = idcount;
-        AffecData(end,:).label = AffectBursts(j).type;
+    while winSize+ winShift*i < length(soundseq(j).data)
+        MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
+        AffectData(end+1,:).data = MFCCs;%extract_stats(MFCCs);
+        AffectData(end,:).id = idcount;
+        AffectData(end,:).label = Samples(j).type;
         i  =i + 1;
         
     end
@@ -42,7 +44,7 @@ end
 
 save ./Dataset/AffectData AffectData
 
-load ./Dataset/AffectData
+%load ./Dataset/AffectData
 
 %% CV
 
@@ -55,7 +57,7 @@ label = zeros(length(LABEL),1);
 label(strcmp(LABEL,'Laughter')) = LAUGHTER;
 label(strcmp(LABEL,'Breathing')) = BREATHING;
 label(strcmp(LABEL,'Other')) = OTHER;
-label(strcmp(LABEL,'REJECTCLASS')) = REJECTCLASS;
+label(strcmp(LABEL,'REJECT')) = REJECT;
 
 %data=zeros(length(AffectData),length(AffectData(1).data));
 
