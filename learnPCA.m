@@ -2,7 +2,7 @@ clear all;clc;
 
 load Dataset/visseq.mat
 
-K=12;
+
 
 W=[];
 for i=1:length(visseq)
@@ -40,8 +40,9 @@ pcaW= pcaW-pcaWmean*ones(1,size(pcaW,2));
 [U,Sn,V] = svd(pcaW*pcaW');
 %[U,Sn,V] = svd(pcaW(:,1:165));
 
-%test
-S = pcaW(:,340);
+%% test
+K=8;
+S = pcaW(:,1:3400);
 
 Ut=U(1:K,:);
 C=S'*Ut';
@@ -53,14 +54,17 @@ recErr=mean(diff.^2);
 
 recAcc=recErr/mean(pcaWmean.^2);
 
-recS = recS+pcaWmean;
-S = S+ pcaWmean;
+recS = recS+pcaWmean*ones(1,3400);
+S = S+ pcaWmean*ones(1,3400);
 
 close all
-
-plot3(S(1:3:end,1),S(2:3:end,1),S(3:3:end,1),'r.');
+for i=1:3400
+    
+    hold off
+plot3(S(1:3:end,i),S(2:3:end,i),S(3:3:end,i),'r.');
 axis equal
 hold on
-plot3(recS(1:3:end,1),recS(2:3:end,1),recS(3:3:end,1),'bO')
-
+plot3(recS(1:3:end,i),recS(2:3:end,i),recS(3:3:end,i),'bO')
+pause(0.01)
+end
 save('PCA', 'U', 'pcaWmean');
