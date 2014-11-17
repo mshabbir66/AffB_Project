@@ -8,7 +8,7 @@ Samples = [AffectBursts;antiAffectBursts'];
 Vfs=120;
 
 visseq(length(Samples)).data = [];
-for i = 1:length(Samples)
+parfor i = 1:length(Samples)
     fidv = fopen(['../Session',Samples(i).fileName(5),'/dialog/MOCAP_rotated/',Samples(i).fileName,'.txt'],'r');
     startFrame = round(Vfs*(Samples(i).startTime)/1000);
     if startFrame < 1
