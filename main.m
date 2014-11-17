@@ -24,36 +24,23 @@ load ./Dataset/seq.mat
 
 
 %% Feature Extraction
-% idcount=1;
-% AffStats = [];
-% for j  = 1:length(Affseq)
-%     i =0;
-%     while winSize+ winShift*i < length(Affseq{j})
-%         MFCCs = ExtractMFCC(Affseq{j}(1+winShift*i:winSize+winShift*i),fs);
-%         AffStats(end+1,:).data = MFCCs;%extract_stats(MFCCs);
-%         AffStats(end,:).id = idcount;
-%         AffStats(end,:).label = AffectBursts(j).type;
-%         i  =i + 1;
-%         
-%     end
-%     idcount=idcount+1;
-% end
-% 
-% nonAffStats = [];
-% for j  = 1:length(nonAffseq)/3
-%     i =0;
-%     while winSize+ winShift*i < length(nonAffseq{j})
-%         MFCCs = ExtractMFCC(nonAffseq{j}(1+winShift*i:winSize+ winShift*i),fs);
-%         nonAffStats(end+1,:).data = MFCCs;%extract_stats(MFCCs);
-%         nonAffStats(end,:).id = idcount;
-%         nonAffStats(end,:).label = 'REJECTCLASS';
-%         i  =i + 1;
-%         
-%     end
-%     idcount=idcount+1;
-% end
-% AffectData=[AffStats;nonAffStats];
-% save ./Dataset/AffectData AffectData
+idcount=1;
+AffecData = [];
+for j  = 1:length(Affseq)
+    i =0;
+    while winSize+ winShift*i < length(Affseq{j})
+        MFCCs = ExtractMFCC(Affseq{j}(1+winShift*i:winSize+winShift*i),fs);
+        AffecData(end+1,:).data = MFCCs;%extract_stats(MFCCs);
+        AffecData(end,:).id = idcount;
+        AffecData(end,:).label = AffectBursts(j).type;
+        i  =i + 1;
+        
+    end
+    idcount=idcount+1;
+end
+
+
+save ./Dataset/AffectData AffectData
 
 load ./Dataset/AffectData
 

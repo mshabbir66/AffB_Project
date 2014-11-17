@@ -2,16 +2,20 @@ clc
 close all
 clear all
 
-load Dataset/AffectBurstsSession123Cleaned
-soundseq{length(AffectBursts)} = [];
-for i = 1:length(AffectBursts)
-    [y,fs] = wavread(['..\Session',AffectBursts(i).fileName(5),'\dialog\wav\',AffectBursts(i).fileName,'.wav']);
-    startFrame = round(fs*(AffectBursts(i).startTime)/1000);
+load AffectBurstsSession123Cleaned
+load antiAffectBursts
+Samples = [AffectBursts;antiAffectBursts'];
+
+soundseq(length(Samples)).data = [];
+
+for i = 1:length(Samples)
+    [y,fs] = wavread(['..\Session',Samples(i).fileName(5),'\dialog\wav\',Samples(i).fileName,'.wav']);
+    startFrame = round(fs*(Samples(i).startTime)/1000);
     if startFrame < 1
         startFrame = 1;
     end
-    endFrame = round(fs*AffectBursts(i).endTime/1000);
-    switch str2num(AffectBursts(i).fileName(5))
+    endFrame = round(fs*Samples(i).endTime/1000);
+    switch str2num(Samples(i).fileName(5))
         case 1
             y = y(startFrame:endFrame,1);
         case 2
@@ -23,3 +27,5 @@ for i = 1:length(AffectBursts)
     disp(['done with ', num2str(i)]);
     
 end
+
+save Dataset/soundseq.mat soundseq
