@@ -2,7 +2,7 @@ clc
 close all
 clear all
 
-load Dataset/AffectBurstsSession123Cleaned
+load AffectBurstsSession123Cleaned
 load antiAffectBursts
 Samples = [AffectBursts;antiAffectBursts'];
 Vfs=120;
