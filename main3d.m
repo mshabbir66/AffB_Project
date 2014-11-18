@@ -15,48 +15,48 @@ winShift = shiftms/1000*fs;
 
 %enum{
 LAUGHTER = 1;
-BREATHING = 1;
-OTHER = 1;
-REJECT = 2;
+BREATHING = 2;
+OTHER = 3;
+REJECT = 4;
 %}
 
-load AffectBurstsSession123Cleaned
-load antiAffectBursts
 load ./Dataset/visseq.mat
 load PCA
 
+% 
+% load AffectBurstsSession123Cleaned
+% load antiAffectBursts
+% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+% 
+% %% Feature Extraction
+% idcount=1;
+% AffectData3d = [];
+% for j  = 1:length(Samples)
+%     datamat=zeros(165,size(visseq(j).data{1,3},1));
+%     for k=1:size(visseq(j).data{1,3},1)
+%         datamat(:,k)=str2double(strsplit(visseq(j).data{1,3}{k}))';
+%     end
+%     i =0;
+%     while winSize+ winShift*i < size(visseq(j).data{1,3},1)
+%         PCAcoef = ExtractPCA(datamat(:,1+winShift*i:winSize+winShift*i),U,pcaWmean,K);
+%         AffectData3d(end+1,:).data = PCAcoef;%extract_stats(MFCCs);
+%         AffectData3d(end,:).id = idcount;
+%         AffectData3d(end,:).label = Samples(j).type;
+%         i  =i + 1;
+%         
+%     end
+%     idcount=idcount+1;
+%     disp(['done with the sample ', num2str(j)]);
+% end
+% 
+% 
+% save ./Dataset/AffectData3d AffectData3d
 
-Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
-
-%% Feature Extraction
-idcount=1;
-AffectData3d = [];
-for j  = 1:length(Samples)
-    datamat=zeros(165,size(visseq(j).data{1,3},1));
-    for k=1:size(visseq(j).data{1,3},1)
-        datamat(:,k)=str2double(strsplit(visseq(j).data{1,3}{k}))';
-    end
-    i =0;
-    while winSize+ winShift*i < size(visseq(j).data{1,3},1)
-        PCAcoef = ExtractPCA(datamat(:,1+winShift*i:winSize+winShift*i),U,pcaWmean,K);
-        AffectData3d(end+1,:).data = PCAcoef;%extract_stats(MFCCs);
-        AffectData3d(end,:).id = idcount;
-        AffectData3d(end,:).label = Samples(j).type;
-        i  =i + 1;
-        
-    end
-    idcount=idcount+1;
-    disp(['done with the sample ', num2str(j)]);
-end
-
-
-save ./Dataset/AffectData3d AffectData3d
-
-%load ./Dataset/AffectData
+load ./Dataset/AffectData
 
 %% CV
 
-addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
+%addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
 ind = randperm(length(AffectData3d))';
 AffectData3d = AffectData3d(ind,:);
  
@@ -82,7 +82,7 @@ NClass = length(labelList);
 bestcv = 0;
 i =1; j =1;
 for log2c = -2:4:34,
-    for log2g = -13:1:-7,
+    for log2g = -10:1:-5,
         cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
         cv(i,j) = get_cv_ac_bin(label, data, cmd, nfoldCV);
         if (cv(i,j) >= bestcv),
@@ -156,5 +156,5 @@ title('Confusion Matrix(Precision)')
 xlabel('GT');
 ylabel('P');
 
-save ./EXP/Detection3d
-saveas(gcf, './EXP/Detection3d', 'fig')
+save ./EXP/Recognition3d
+saveas(gcf, './EXP/Recognition3d', 'fig')
