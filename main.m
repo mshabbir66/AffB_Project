@@ -131,6 +131,11 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 % 
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
+
+%% Plots!
+figure;
+set(gcf,'Position',[50 50 1200 600]);
+
 subplot(1,3,1)
 bar3(ConfusionMatrix);
 title('Confusion Matrix')
@@ -147,3 +152,6 @@ bar3(ConfusionMatrixPrecision);
 title('Confusion Matrix(Precision)')
 xlabel('GT');
 ylabel('P');
+
+
+saveas(gcf, './EXP/Recognition', 'fig');
