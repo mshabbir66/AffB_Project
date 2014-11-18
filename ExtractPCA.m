@@ -6,10 +6,10 @@ Ut=U(1:K,:);
 
 for i=1:size(visSignal,2)
     In=isnan(S(:,i));
-    S=S(~In,:);
+    Stemp=S(~In,i);
     Utemp=Ut(:,~In);
-    PCAcoefframe=S'*Ut';
-    PCAcoef(:,i)=PCAcoefframe';
+    PCAcoefframe=Stemp'*Ut';
+    PCAcoef(i,:)=PCAcoefframe;
 end
 
         

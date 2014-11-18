@@ -41,11 +41,18 @@ pcaW= pcaW-pcaWmean*ones(1,size(pcaW,2));
 %[U,Sn,V] = svd(pcaW(:,1:165));
 
 %% test
-K=8;
-S = pcaW(:,1:3400);
+K=160;
+n=340;
+S = pcaW(:,1:n);
 
+S = S+ pcaWmean*ones(1,n);
+
+C=ExtractPCA(S,U,pcaWmean,K);
+
+
+% Ut=U(1:K,:);
+% C=S'*Ut';
 Ut=U(1:K,:);
-C=S'*Ut';
 recS = (C*Ut)';
 
 diff=S-recS;
@@ -54,11 +61,11 @@ recErr=mean(diff.^2);
 
 recAcc=recErr/mean(pcaWmean.^2);
 
-recS = recS+pcaWmean*ones(1,3400);
-S = S+ pcaWmean*ones(1,3400);
+recS = recS+pcaWmean*ones(1,n);
+%S = S+ pcaWmean*ones(1,n);
 
 close all
-for i=1:3400
+for i=1:n
     
     hold off
 plot3(S(1:3:end,i),S(2:3:end,i),S(3:3:end,i),'r.');
@@ -67,4 +74,4 @@ hold on
 plot3(recS(1:3:end,i),recS(2:3:end,i),recS(3:3:end,i),'bO')
 pause(0.01)
 end
-save('PCA', 'U', 'pcaWmean');
+%save('PCA_', 'U', 'pcaWmean');
