@@ -108,7 +108,7 @@ parfor i=1:max(extractfield(AffectData,'id'))
     [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
     
     acc(i).accuracy=accuracy(1);
-    acc(i).trainLabel = testLabel;
+    acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
     
     disp(['done with ', num2str(i)]);
@@ -119,7 +119,7 @@ acc = acc(~isnan(extractfield(acc,'accuracy')));
 ave = mean(extractfield(acc,'accuracy'));
 fprintf('Ave. Accuracy = %g%%\n', ave);
 predictLabels = extractfield(acc, 'predict_label');
-testLabels = extractfield(acc, 'trainLabel');
+testLabels = extractfield(acc, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
     ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);
