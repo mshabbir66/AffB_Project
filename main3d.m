@@ -155,3 +155,6 @@ bar3(ConfusionMatrixPrecision);
 title('Confusion Matrix(Precision)')
 xlabel('GT');
 ylabel('P');
+
+save ./EXP/Detection3d
+saveas(gcf, './EXP/Detection3d', 'fig')
