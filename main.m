@@ -106,12 +106,44 @@ parfor i=1:max(extractfield(AffectData,'id'))
     
     model = svmtrain(trainLabel, trainData, bestParam);
     [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
-    acc(i)=accuracy(1);
+    
+    acc(i).accuracy=accuracy(1);
+    acc(i).trainLabel = testLabel;
+    acc(i).predict_label = predict_label;
+    
     disp(['done with ', num2str(i)]);
 end
 
-ave=mean(acc(~isnan(acc)));
+%ave=mean(acc(~isnan(acc)));
+acc = acc(~isnan(extractfield(acc,'accuracy')));
+ave = mean(extractfield(acc,'accuracy'));
 fprintf('Ave. Accuracy = %g%%\n', ave);
+predictLabels = extractfield(acc, 'predict_label');
+testLabels = extractfield(acc, 'trainLabel');
+for i =1:NClass
+    for j = 1:NClass
+    ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);
+    end
+end
+ConfusionMatrixSensitivity = ConfusionMatrix./(sum(ConfusionMatrix,2)*ones(1,NClass));
+ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,1));
+
 % 
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
+subplot(1,3,1)
+bar3(ConfusionMatrix);
+title('Confusion Matrix')
+xlabel('GT');
+ylabel('P')
+subplot(1,3,2)
+bar3(ConfusionMatrixSensitivity);
+title('Confusion Matrix(Sensitivity)')
+xlabel('GT');
+ylabel('P');
+subplot(1,3,3)
+
+bar3(ConfusionMatrixPrecision);
+title('Confusion Matrix(Precision)')
+xlabel('GT');
+ylabel('P');
