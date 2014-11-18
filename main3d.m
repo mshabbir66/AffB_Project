@@ -15,9 +15,9 @@ winShift = shiftms/1000*fs;
 
 %enum{
 LAUGHTER = 1;
-BREATHING = 2;
-OTHER = 3;
-REJECT = 4;
+BREATHING = 1;
+OTHER = 1;
+REJECT = 2;
 %}
 
 load AffectBurstsSession123Cleaned
@@ -30,7 +30,7 @@ Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
 %% Feature Extraction
 idcount=1;
-AffectData = [];
+AffectData3d = [];
 for j  = 1:length(Samples)
     datamat=zeros(165,size(visseq(j).data{1,3},1));
     for k=1:size(visseq(j).data{1,3},1)
@@ -39,9 +39,9 @@ for j  = 1:length(Samples)
     i =0;
     while winSize+ winShift*i < size(visseq(j).data{1,3},1)
         PCAcoef = ExtractPCA(datamat(:,1+winShift*i:winSize+winShift*i),U,pcaWmean,K);
-        AffectData(end+1,:).data = PCAcoef;%extract_stats(MFCCs);
-        AffectData(end,:).id = idcount;
-        AffectData(end,:).label = Samples(j).type;
+        AffectData3d(end+1,:).data = PCAcoef;%extract_stats(MFCCs);
+        AffectData3d(end,:).id = idcount;
+        AffectData3d(end,:).label = Samples(j).type;
         i  =i + 1;
         
     end
@@ -50,17 +50,17 @@ for j  = 1:length(Samples)
 end
 
 
-save ./Dataset/AffectData AffectData
+save ./Dataset/AffectData3d AffectData3d
 
 %load ./Dataset/AffectData
 
 %% CV
 
 addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
-ind = randperm(length(AffectData))';
-AffectData = AffectData(ind,:);
+ind = randperm(length(AffectData3d))';
+AffectData3d = AffectData3d(ind,:);
  
-LABEL=extractfield(AffectData,'label')';
+LABEL=extractfield(AffectData3d,'label')';
 label = zeros(length(LABEL),1);
 label(strcmp(LABEL,'Laughter')) = LAUGHTER;
 label(strcmp(LABEL,'Breathing')) = BREATHING;
@@ -69,8 +69,8 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 %data=zeros(length(AffectData),length(AffectData(1).data));
 
-for i=1:length(AffectData)
-    data(i,:)=extract_stats(AffectData(i).data);
+for i=1:length(AffectData3d)
+    data(i,:)=extract_stats(AffectData3d(i).data);
 end
 
 labelList = unique(label);
@@ -94,7 +94,7 @@ for log2c = -2:4:34,
     j =1;
     i = i + 1;
 end
-
+imagesc(cv);
 %% #######################
 % % Train the SVM in one-vs-rest (OVR) mode
 % % #######################
@@ -105,12 +105,12 @@ end
 % 
 % %% Leave one out test
 % 
-parfor i=1:max(extractfield(AffectData,'id'))
-    testData=data(extractfield(AffectData,'id')==i,:);
-    testLabel=label(extractfield(AffectData,'id')==i);
+parfor i=1:max(extractfield(AffectData3d,'id'))
+    testData=data(extractfield(AffectData3d,'id')==i,:);
+    testLabel=label(extractfield(AffectData3d,'id')==i);
     
-    trainData=data(extractfield(AffectData,'id')~=i,:);
-    trainLabel=label(extractfield(AffectData,'id')~=i);
+    trainData=data(extractfield(AffectData3d,'id')~=i,:);
+    trainLabel=label(extractfield(AffectData3d,'id')~=i);
     
     model = svmtrain(trainLabel, trainData, bestParam);
     [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
