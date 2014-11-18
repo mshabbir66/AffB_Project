@@ -8,7 +8,7 @@ for i=1:size(visSignal,2)
     In=isnan(S(:,i));
     Stemp=S(~In,i);
     Utemp=Ut(:,~In);
-    PCAcoefframe=Stemp'*Ut';
+    PCAcoefframe=Stemp'*Utemp';
     PCAcoef(i,:)=PCAcoefframe;
 end
 
