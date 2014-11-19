@@ -52,7 +52,7 @@ load PCA
 % 
 % save ./Dataset/AffectData3d AffectData3d
 
-load ./Dataset/AffectData
+load ./Dataset/AffectData3d
 
 %% CV
 
