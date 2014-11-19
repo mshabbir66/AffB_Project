@@ -155,3 +155,4 @@ ylabel('P');
 
 
 %saveas(gcf, './EXP/Detection', 'fig');
+saveas(gcf, './EXP/Recognition', 'fig');
