@@ -2,20 +2,7 @@ clc
 close all
 clear all
 
-winms=750; %in ms
-shiftms=250; %frame periodicity in ms
-
 nfoldCV=3;
-fs = 16000;
-Vfs = 120;
-K=12;
-
-winSize  = winms/1000*fs;
-winShift = shiftms/1000*fs;
-
-winSize3d  = winms/1000*Vfs;
-winShift3d = shiftms/1000*Vfs;
-
 %enum{
 LAUGHTER = 1;
 BREATHING = 2;
@@ -23,48 +10,61 @@ OTHER = 3;
 REJECT = 4;
 %}
 
-load AffectBurstsSession123Cleaned
-load antiAffectBursts
-load ./Dataset/soundseq.mat
-load ./Dataset/visseq.mat
-load PCA
-
-Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
-
-% Feature Extraction
-idcount=1;
-AffectDataSync = [];
-for j  = 1:length(Samples)
-    datamat=zeros(165,size(visseq(j).data{1,3},1));
-    for k=1:size(visseq(j).data{1,3},1)
-        datamat(:,k)=str2double(strsplit(visseq(j).data{1,3}{k}))';
-    end
-    i =0;
-    while winSize3d+ winShift3d*i < size(visseq(j).data{1,3},1)
-        
-        PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
-        AffectDataSync(end+1,:).data3d = PCAcoef;%extract_stats(PCAcoef);
-        
-        MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
-        AffectDataSync(end,:).data = MFCCs;%extract_stats(MFCCs);
-        
-        AffectDataSync(end,:).id = idcount;
-        AffectDataSync(end,:).label = Samples(j).type;
-        i  =i + 1;
-        
-    end
-    idcount=idcount+1;
-    disp(['done with the sample ', num2str(j), ' #wins in total: ' num2str(length(AffectDataSync))]);
-end
-
-
-save('./Dataset/AffectDataSync', 'AffectDataSync');
+% winms=750; %in ms
+% shiftms=250; %frame periodicity in ms
+% 
+% winSize  = winms/1000*fs;
+% winShift = shiftms/1000*fs;
+% 
+% winSize3d  = winms/1000*Vfs;
+% winShift3d = shiftms/1000*Vfs;
+% 
+% fs = 16000;
+% Vfs = 120;
+% K=12;
+% 
+% load AffectBurstsSession123Cleaned
+% load antiAffectBursts
+% load ./Dataset/soundseq.mat
+% load ./Dataset/visseq.mat
+% load PCA
+% 
+% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+% 
+% % Feature Extraction
+% idcount=1;
+% AffectDataSync = [];
+% for j  = 1:length(Samples)
+%     datamat=zeros(165,size(visseq(j).data{1,3},1));
+%     for k=1:size(visseq(j).data{1,3},1)
+%         datamat(:,k)=str2double(strsplit(visseq(j).data{1,3}{k}))';
+%     end
+%     i =0;
+%     while winSize3d+ winShift3d*i < size(visseq(j).data{1,3},1)
+%         
+%         PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
+%         AffectDataSync(end+1,:).data3d = PCAcoef;%extract_stats(PCAcoef);
+%         
+%         MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
+%         AffectDataSync(end,:).data = MFCCs;%extract_stats(MFCCs);
+%         
+%         AffectDataSync(end,:).id = idcount;
+%         AffectDataSync(end,:).label = Samples(j).type;
+%         i  =i + 1;
+%         
+%     end
+%     idcount=idcount+1;
+%     disp(['done with the sample ', num2str(j), ' #wins in total: ' num2str(length(AffectDataSync))]);
+% end
+% 
+% 
+% save('./Dataset/AffectDataSync', 'AffectDataSync');
 
 load ./Dataset/AffectDataSync
 
 %% CV
 
-addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
+%addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
 ind = randperm(length(AffectDataSync))';
 AffectDataSync = AffectDataSync(ind,:);
  
@@ -78,11 +78,11 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 %data=zeros(length(AffectData),length(AffectData(1).data));
 
 for i=1:length(AffectDataSync)
-    data(i,:)=extract_stats(AffectDataSync(i).data);
+    datatemp(i,:)=extract_stats(AffectDataSync(i).data);
 end
 
 for i=1:length(AffectDataSync)
-    data(i,:)=[data(i,:) extract_stats(AffectDataSync(i).data3d)];
+    data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
 end
 
 labelList = unique(label);
