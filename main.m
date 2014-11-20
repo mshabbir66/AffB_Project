@@ -25,24 +25,24 @@ load ./Dataset/soundseq.mat
 
 Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
-%% Feature Extraction
-% idcount=1;
-% AffectData = [];
-% for j  = 1:length(Samples)
-%     i =0;
-%     while winSize+ winShift*i < length(soundseq(j).data)
-%         MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
-%         AffectData(end+1,:).data = MFCCs;%extract_stats(MFCCs);
-%         AffectData(end,:).id = idcount;
-%         AffectData(end,:).label = Samples(j).type;
-%         i  =i + 1;
-%         
-%     end
-%     idcount=idcount+1;
-% end
-% 
-% 
-% save ./Dataset/AffectData AffectData
+% Feature Extraction
+idcount=1;
+AffectData = [];
+for j  = 1:length(Samples)
+    i =0;
+    while winSize+ winShift*i < length(soundseq(j).data)
+        MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
+        AffectData(end+1,:).data = MFCCs;%extract_stats(MFCCs);
+        AffectData(end,:).id = idcount;
+        AffectData(end,:).label = Samples(j).type;
+        i  =i + 1;
+        
+    end
+    idcount=idcount+1;
+end
+
+
+%save ./Dataset/AffectData AffectData
 
 load ./Dataset/AffectData
 
