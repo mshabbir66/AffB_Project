@@ -6,12 +6,15 @@ winms=750; %in ms
 shiftms=250; %frame periodicity in ms
 
 nfoldCV=3;
-fs = 120;
+fs = 16000;
+Vfs = 120;
 K=12;
-
 
 winSize  = winms/1000*fs;
 winShift = shiftms/1000*fs;
+
+winSize3d  = winms/1000*Vfs;
+winShift3d = shiftms/1000*Vfs;
 
 %enum{
 LAUGHTER = 1;
@@ -20,47 +23,51 @@ OTHER = 3;
 REJECT = 4;
 %}
 
+load AffectBurstsSession123Cleaned
+load antiAffectBursts
+load ./Dataset/soundseq.mat
 load ./Dataset/visseq.mat
 load PCA
 
-
-load AffectBurstsSession123Cleaned
-load antiAffectBursts
 Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
-%% Feature Extraction
+% Feature Extraction
 idcount=1;
-AffectData3d = [];
+AffectDataSync = [];
 for j  = 1:length(Samples)
     datamat=zeros(165,size(visseq(j).data{1,3},1));
     for k=1:size(visseq(j).data{1,3},1)
         datamat(:,k)=str2double(strsplit(visseq(j).data{1,3}{k}))';
     end
     i =0;
-    while winSize+ winShift*i < size(visseq(j).data{1,3},1)
-        PCAcoef = ExtractPCA(datamat(:,1+winShift*i:winSize+winShift*i),U,pcaWmean,K);
-        AffectData3d(end+1,:).data = PCAcoef;%extract_stats(PCAcoef);
-        AffectData3d(end,:).id = idcount;
-        AffectData3d(end,:).label = Samples(j).type;
+    while winSize3d+ winShift3d*i < size(visseq(j).data{1,3},1)
+        
+        PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
+        AffectDataSync(end+1,:).data3d = PCAcoef;%extract_stats(PCAcoef);
+        
+        MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
+        AffectDataSync(end,:).data = MFCCs;%extract_stats(MFCCs);
+        
+        AffectDataSync(end,:).id = idcount;
+        AffectDataSync(end,:).label = Samples(j).type;
         i  =i + 1;
         
     end
     idcount=idcount+1;
-    disp(['done with the sample ', num2str(j)]);
 end
 
 
-save ./Dataset/AffectData3d AffectData3d
+save('./Dataset/AffectDataSync', 'AffectDataSync');
 
-load ./Dataset/AffectData3d
+load ./Dataset/AffectDataSync
 
 %% CV
 
-%addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
-ind = randperm(length(AffectData3d))';
-AffectData3d = AffectData3d(ind,:);
+addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
+ind = randperm(length(AffectDataSync))';
+AffectDataSync = AffectDataSync(ind,:);
  
-LABEL=extractfield(AffectData3d,'label')';
+LABEL=extractfield(AffectDataSync,'label')';
 label = zeros(length(LABEL),1);
 label(strcmp(LABEL,'Laughter')) = LAUGHTER;
 label(strcmp(LABEL,'Breathing')) = BREATHING;
@@ -69,8 +76,12 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 %data=zeros(length(AffectData),length(AffectData(1).data));
 
-for i=1:length(AffectData3d)
-    data(i,:)=extract_stats(AffectData3d(i).data);
+for i=1:length(AffectDataSync)
+    data(i,:)=extract_stats(AffectDataSync(i).data);
+end
+
+for i=1:length(AffectDataSync)
+    data(i,:)=[data(i,:) extract_stats(AffectDataSync(i).data3d)];
 end
 
 labelList = unique(label);
@@ -82,7 +93,7 @@ NClass = length(labelList);
 bestcv = 0;
 i =1; j =1;
 for log2c = -2:4:34,
-    for log2g = -10:1:-5,
+    for log2g = -13:1:-7,
         cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
         cv(i,j) = get_cv_ac_bin(label, data, cmd, nfoldCV);
         if (cv(i,j) >= bestcv),
@@ -94,7 +105,7 @@ for log2c = -2:4:34,
     j =1;
     i = i + 1;
 end
-imagesc(cv);
+
 %% #######################
 % % Train the SVM in one-vs-rest (OVR) mode
 % % #######################
@@ -105,12 +116,12 @@ imagesc(cv);
 % 
 % %% Leave one out test
 % 
-parfor i=1:max(extractfield(AffectData3d,'id'))
-    testData=data(extractfield(AffectData3d,'id')==i,:);
-    testLabel=label(extractfield(AffectData3d,'id')==i);
+parfor i=1:max(extractfield(AffectDataSync,'id'))
+    testData=data(extractfield(AffectDataSync,'id')==i,:);
+    testLabel=label(extractfield(AffectDataSync,'id')==i);
     
-    trainData=data(extractfield(AffectData3d,'id')~=i,:);
-    trainLabel=label(extractfield(AffectData3d,'id')~=i);
+    trainData=data(extractfield(AffectDataSync,'id')~=i,:);
+    trainLabel=label(extractfield(AffectDataSync,'id')~=i);
     
     model = svmtrain(trainLabel, trainData, bestParam);
     [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
@@ -139,6 +150,11 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 % 
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
+
+%% Plots!
+figure;
+set(gcf,'Position',[50 50 1200 600]);
+
 subplot(1,3,1)
 bar3(ConfusionMatrix);
 title('Confusion Matrix')
@@ -156,5 +172,8 @@ title('Confusion Matrix(Precision)')
 xlabel('GT');
 ylabel('P');
 
+
+%saveas(gcf, './EXP/Detection', 'fig');
+saveas(gcf, './EXP/Recognition', 'fig');
+
 save ./EXP/Recognition3d
-saveas(gcf, './EXP/Recognition3d', 'fig')
