@@ -7,7 +7,7 @@ nfoldCV=3;
 LAUGHTER = 1;
 BREATHING = 2;
 OTHER = 3;
-REJECT = 4;
+REJECT = 3;
 %}
 
 % winms=750; %in ms
@@ -174,7 +174,11 @@ xlabel('GT');
 ylabel('P');
 
 
-%saveas(gcf, './EXP/Detection', 'fig');
-saveas(gcf, './EXP/RecognitionFused_2', 'fig');
+% saveas(gcf, './EXP/DetectionFused_1', 'fig');
+% save ./EXP/DetectionFused_1
 
-save ./EXP/Recognition3dFused_2
+% saveas(gcf, './EXP/RecognitionFused_1', 'fig');
+% save ./EXP/RecognitionFused_1
+
+saveas(gcf, './EXP/RecognitionFused_3class', 'fig');
+save ./EXP/RecognitionFused_3class
