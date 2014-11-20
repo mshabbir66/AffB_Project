@@ -93,8 +93,8 @@ NClass = length(labelList);
 % % #######################
 bestcv = 0;
 i =1; j =1;
-for log2c = -2:4:34,
-    for log2g = -13:1:-7,
+for log2c = -2:4:46,
+    for log2g = -14:1:-10,
         cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
         cv(i,j) = get_cv_ac_bin(label, data, cmd, nfoldCV);
         if (cv(i,j) >= bestcv),
@@ -106,7 +106,7 @@ for log2c = -2:4:34,
     j =1;
     i = i + 1;
 end
-
+imagesc(cv);
 %% #######################
 % % Train the SVM in one-vs-rest (OVR) mode
 % % #######################
@@ -175,6 +175,6 @@ ylabel('P');
 
 
 %saveas(gcf, './EXP/Detection', 'fig');
-saveas(gcf, './EXP/Recognition', 'fig');
+saveas(gcf, './EXP/RecognitionFused_2', 'fig');
 
-save ./EXP/Recognition3d
+save ./EXP/Recognition3dFused_2
