@@ -54,6 +54,7 @@ for j  = 1:length(Samples)
         
     end
     idcount=idcount+1;
+    disp(['done with the sample ', num2str(j), ' #wins in total: ' num2str(length(AffectDataSync))]);
 end
 
 
