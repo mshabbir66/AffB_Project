@@ -10,6 +10,10 @@ OTHER = 3;
 REJECT = 3;
 %}
 
+% fs = 16000;
+% Vfs = 120;
+% K=12;
+
 % winms=750; %in ms
 % shiftms=250; %frame periodicity in ms
 % 
@@ -19,9 +23,6 @@ REJECT = 3;
 % winSize3d  = winms/1000*Vfs;
 % winShift3d = shiftms/1000*Vfs;
 % 
-% fs = 16000;
-% Vfs = 120;
-% K=12;
 % 
 % load AffectBurstsSession123Cleaned
 % load antiAffectBursts
