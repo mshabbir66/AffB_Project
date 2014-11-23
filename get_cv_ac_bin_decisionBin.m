@@ -10,8 +10,12 @@ for i=1:nr_fold % Cross training : folding
   sherwood_train(x(train_ind,:)', y(train_ind), param);
   
   probabilities = sherwood_classify(x(test_ind,:)', param);
-  predictLabels = ones(length(probabilities),1);
-  predictLabels(probabilities(1,:) < 0.5) = 2;
+  [~,predictLabels] = max(probabilities,[],1);
+  predictLabels = predictLabels';
+  
+  %predictLabels = ones(length(probabilities),1);
+  %predictLabels(probabilities(1,:) < 0.5) = 2;
+  
   %[pred,a,decv] = svmpredict(y(test_ind),x(test_ind,:),model);
   ac = ac + sum(y(test_ind)==predictLabels);
 end
