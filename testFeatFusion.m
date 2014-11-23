@@ -121,3 +121,6 @@ disp(['FN= ', num2str(sum(real_label_scaled & ~(predict_label_r_d)))]);
 %     end
 %     pause
 % end 
+
+saveas(gcf, './EXP/DetectionFused_Unseen', 'fig');
+save ./EXP/DetectionFused_Unseen
