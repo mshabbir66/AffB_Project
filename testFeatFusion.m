@@ -49,9 +49,13 @@ model = svmtrain(label, data, bestParam);
 [predict_label, accuracy, prob_values] = svmpredict(zeros(size(unseenStats,1),1), unseenStats, model);
 predict_label = 2-predict_label;
 
-%%
-load('./Dataset/Ses04F_impro03.mat');
-real_label = GenerateAffectBurstLabelsForSingleFile(Ses04,'Ses04F_impro03',numberOfFrames);
+
+%load checkpoint1
+%% ground truth compare
+file = 'Ses04F_impro03';
+path = './Dataset/';
+load([path file '_candogan2.mat']);
+real_label = GenerateAffectBurstLabelsForSingleFile(Ses04,'Ses04F_impro03_candogan2',numberOfFrames);
 
 
 
@@ -131,10 +135,10 @@ disp(['FN= ', num2str(sum(real_label_scaled & ~(predict_label_r_d)))]);
 
 
 %videoFReader = vision.VideoFileReader('./Dataset/Ses04F_impro03.avi', 'AudioOutputPort', 1);
-readObj = VideoReader('../Session4/dialog/DivX/Ses04F_impro03.avi');
+readObj = VideoReader(['../Session4/dialog/DivX/' file '.avi']);
 get(readObj);
 %videoFWriter = vision.VideoFileWriter('./Dataset/Ses04F_impro03test.avi','AudioInputPort', 1,'FrameRate',videoFReader.info.VideoFrameRate);
-writeObj = VideoWriter('./Dataset/Ses04F_impro03test.avi','Motion JPEG AVI');
+writeObj = VideoWriter(['./Dataset/' file 'candogan2test.avi'],'Motion JPEG AVI');
 writeObj.FrameRate = readObj.FrameRate;
 %set(writeObj,'FrameRate',readObj.FrameRate);
 open(writeObj);

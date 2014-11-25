@@ -48,12 +48,12 @@ suffix = dataArray{:, 5};
 %% Clear temporary variables
 clearvars filename delimiter formatSpec fileID dataArray ans;
 
-Ses04{length(type)}={};
+Ses04.endTime=zeros(length(type));
 for i=1:length(type)
-    Ses04{i}.type=type{i};
-    Ses04{i}.startTime=sT(i);
-    Ses04{i}.endTime=eT(i);
-    Ses04{i}.fileName=file(1:end-4);
+    Ses04(i).type=type{i};
+    Ses04(i).startTime=sT(i);
+    Ses04(i).endTime=eT(i);
+    Ses04(i).fileName=file(1:end-4);
 end
 
 save([path file(1:end-4)],'Ses04');
