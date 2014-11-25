@@ -13,9 +13,9 @@ winShift = shiftms/1000*fs;
 
 %enum{
 LAUGHTER = 1;
-BREATHING = 1;
-OTHER = 1;
-REJECT = 2;
+BREATHING = 2;
+OTHER = 3;
+REJECT = 4;
 %}
 
 % load AffectBurstsSession123Cleaned
@@ -152,7 +152,7 @@ title('Confusion Matrix(Precision)')
 xlabel('GT');
 ylabel('P');
 
-save('./EXP/DetectionSound');
+save('./EXP/RecognitionSound');
 %save('RecognitionSound_3class', 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
 %saveas(gcf, './EXP/Detection', 'fig');
-saveas(gcf, './EXP/DetectionnSound', 'fig');
+saveas(gcf, './EXP/RecognitionSound', 'fig');
