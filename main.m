@@ -13,33 +13,33 @@ winShift = shiftms/1000*fs;
 
 %enum{
 LAUGHTER = 1;
-BREATHING = 2;
-OTHER = 3;
-REJECT = 4;
+BREATHING = 1;
+OTHER = 1;
+REJECT = 2;
 %}
 
-load AffectBurstsSession123Cleaned
-load antiAffectBursts
-load ./Dataset/soundseq.mat
-
-
-Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
-
-% Feature Extraction
-idcount=1;
-AffectData = [];
-for j  = 1:length(Samples)
-    i =0;
-    while winSize+ winShift*i < length(soundseq(j).data)
-        MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
-        AffectData(end+1,:).data = MFCCs;%extract_stats(MFCCs);
-        AffectData(end,:).id = idcount;
-        AffectData(end,:).label = Samples(j).type;
-        i  =i + 1;
-        
-    end
-    idcount=idcount+1;
-end
+% load AffectBurstsSession123Cleaned
+% load antiAffectBursts
+% load ./Dataset/soundseq.mat
+% 
+% 
+% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+% 
+% % Feature Extraction
+% idcount=1;
+% AffectData = [];
+% for j  = 1:length(Samples)
+%     i =0;
+%     while winSize+ winShift*i < length(soundseq(j).data)
+%         MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
+%         AffectData(end+1,:).data = MFCCs;%extract_stats(MFCCs);
+%         AffectData(end,:).id = idcount;
+%         AffectData(end,:).label = Samples(j).type;
+%         i  =i + 1;
+%         
+%     end
+%     idcount=idcount+1;
+% end
 
 
 %save ./Dataset/AffectData AffectData
@@ -127,10 +127,9 @@ for i =1:NClass
 end
 ConfusionMatrixSensitivity = ConfusionMatrix./(sum(ConfusionMatrix,2)*ones(1,NClass));
 ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,1));
+ 
 
-% 
-% 
-% %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
+save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
 
 %% Plots!
 figure;
@@ -153,6 +152,7 @@ title('Confusion Matrix(Precision)')
 xlabel('GT');
 ylabel('P');
 
-
+save('./EXP/DetectionSound');
+%save('RecognitionSound_3class', 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
 %saveas(gcf, './EXP/Detection', 'fig');
-saveas(gcf, './EXP/Recognition', 'fig');
+saveas(gcf, './EXP/DetectionnSound', 'fig');
