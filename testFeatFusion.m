@@ -49,14 +49,12 @@ model = svmtrain(label, data, bestParam);
 [predict_label, accuracy, prob_values] = svmpredict(zeros(size(unseenStats,1),1), unseenStats, model);
 predict_label = 2-predict_label;
 
-
-%load checkpoint1
 %% ground truth compare
 file = 'Ses04F_impro03';
-path = './Dataset/';
-load([path file '_candogan2.mat']);
-real_label = GenerateAffectBurstLabelsForSingleFile(Ses04,'Ses04F_impro03_candogan2',numberOfFrames);
+suffix = '_candogan2.mat';
 
+load(['./Dataset/' file suffix]);
+real_label = GenerateAffectBurstLabelsForSingleFile(Ses04,[file suffix],numberOfFrames);
 
 
 figure(1);
@@ -138,7 +136,7 @@ disp(['FN= ', num2str(sum(real_label_scaled & ~(predict_label_r_d)))]);
 readObj = VideoReader(['../Session4/dialog/DivX/' file '.avi']);
 get(readObj);
 %videoFWriter = vision.VideoFileWriter('./Dataset/Ses04F_impro03test.avi','AudioInputPort', 1,'FrameRate',videoFReader.info.VideoFrameRate);
-writeObj = VideoWriter(['./Dataset/' file 'candogan2test.avi'],'Motion JPEG AVI');
+writeObj = VideoWriter(['./Dataset/' file suffix 'test.avi'],'Motion JPEG AVI');
 writeObj.FrameRate = readObj.FrameRate;
 %set(writeObj,'FrameRate',readObj.FrameRate);
 open(writeObj);
@@ -161,12 +159,16 @@ for k=1:readObj.NumberOfFrames
     subplot(5,1,4);
     bar(twin,predict_label_r_d);
     title('Predicted');hold on;
+    if(~isempty(step))
     line([step,step],[0,1],'LineWidth',4,'Color','r');
+    end
     hold off;
     subplot(5,1,5);
     bar(twin,real_label_scaled,'g');
     title('Real');
+    if(~isempty(step))
     line([step,step],[0,1],'LineWidth',4,'Color','r');
+    end
     hold off;
     drawnow;
     M=getframe(gcf);
