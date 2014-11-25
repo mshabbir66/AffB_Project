@@ -131,7 +131,7 @@ disp(['FN= ', num2str(sum(real_label_scaled & ~(predict_label_r_d)))]);
 
 
 %videoFReader = vision.VideoFileReader('./Dataset/Ses04F_impro03.avi', 'AudioOutputPort', 1);
-readObj = VideoReader('./Dataset/Ses04F_impro03.avi');
+readObj = VideoReader('../Session4/dialog/DivX/Ses04F_impro03.avi');
 get(readObj);
 %videoFWriter = vision.VideoFileWriter('./Dataset/Ses04F_impro03test.avi','AudioInputPort', 1,'FrameRate',videoFReader.info.VideoFrameRate);
 writeObj = VideoWriter('./Dataset/Ses04F_impro03test.avi','Motion JPEG AVI');
