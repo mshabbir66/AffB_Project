@@ -1,4 +1,4 @@
-function labels = GenerateAffectBurstLabel(AffectBurst,numberOfFrames)
+function labels = GenerateAffectBurstLabel(AffectBurst,numberOfFrames,labelmap)
 
 soundFrameDuration = 1; %in ms
 
@@ -8,7 +8,9 @@ labels = zeros(1,numberOfFrames);
 
 startTimes = AffectBurst.startTime;
 endTimes = AffectBurst.endTime;
-
-labels(time>startTimes & time< endTimes) = 1;
-
+if nargin ==2
+    labels(time>startTimes & time< endTimes) = 1;
+else
+    labels(time>startTimes & time< endTimes) = labelmap(AffectBurst.type);
+end
 end
