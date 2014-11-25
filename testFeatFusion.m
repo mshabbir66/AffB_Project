@@ -122,5 +122,54 @@ disp(['FN= ', num2str(sum(real_label_scaled & ~(predict_label_r_d)))]);
 %     pause
 % end 
 
-saveas(gcf, './EXP/DetectionFused_Unseen', 'fig');
-save ./EXP/DetectionFused_Unseen
+
+
+%saveas(gcf, './EXP/DetectionFused_Unseen', 'fig');
+%save ./EXP/DetectionFused_Unseen
+
+%% play
+
+
+%videoFReader = vision.VideoFileReader('./Dataset/Ses04F_impro03.avi', 'AudioOutputPort', 1);
+readObj = VideoReader('./Dataset/Ses04F_impro03.avi');
+get(readObj);
+%videoFWriter = vision.VideoFileWriter('./Dataset/Ses04F_impro03test.avi','AudioInputPort', 1,'FrameRate',videoFReader.info.VideoFrameRate);
+writeObj = VideoWriter('./Dataset/Ses04F_impro03test.avi','Motion JPEG AVI');
+writeObj.FrameRate = readObj.FrameRate;
+%set(writeObj,'FrameRate',readObj.FrameRate);
+open(writeObj);
+
+figure;
+set(gcf,'Position',[50 50 1200 600]);
+set(gcf,'Renderer','zbuffer');
+EOF=0;
+x=0;
+%while ~isDone(videoFReader)
+for k=1:readObj.NumberOfFrames
+    %[I, AUDIO] = step(videoFReader);
+    I = read(readObj, k);
+    subplot(5,1,[1,2,3]);
+    imshow(I);
+    
+    x=x+1/readObj.FrameRate;
+    step=min(twin(x<twin));
+    
+    subplot(5,1,4);
+    bar(twin,predict_label_r_d);
+    title('Predicted');hold on;
+    line([step,step],[0,1],'LineWidth',4,'Color','r');
+    hold off;
+    subplot(5,1,5);
+    bar(twin,real_label_scaled,'g');
+    title('Real');
+    line([step,step],[0,1],'LineWidth',4,'Color','r');
+    hold off;
+    drawnow;
+    M=getframe(gcf);
+    %step(videoFWriter,I,AUDIO);
+    writeVideo(writeObj,M);
+end
+%release(videoFWriter);
+close(writeObj);
+close(readObj);
+%release(videoFReader);
