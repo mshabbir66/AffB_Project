@@ -12,6 +12,7 @@ sherwood-classify-matlab/
 #Files
 temp.*
 *.asv
+*.bin
 
 # Folder config file
 Desktop.ini
