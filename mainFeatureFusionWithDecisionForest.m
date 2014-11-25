@@ -97,11 +97,11 @@ trainData = single(data);
 trainLabel = uint8(label);
 
 
-settings.MaxDecisionLevels = 10;
+settings.MaxDecisionLevels = 20;
 
 % Number of candidate feature response functions per split node
 % Default: 10.
-settings.NumberOfCandidateFeatures = 10;
+settings.NumberOfCandidateFeatures = 30;
 
 % Optimal entropy split is determined by thresholding on 
 % NumberOfCandidateThresholdsPerFeature equidistant points
@@ -139,8 +139,8 @@ settings.forestName = 'temp.bin';
 
  bestcv = 0;
  i =1; j =1;
- for MaxDecisionLevels = 11:15,
-     for NumberOfTrees = 80:10:150
+ for MaxDecisionLevels = 5:2:15,
+     for NumberOfTrees = 40:20:200
          settings.MaxDecisionLevels = MaxDecisionLevels;
          settings.NumberOfTrees = NumberOfTrees;
          cv(i,j) = get_cv_ac_bin_decisionBin(trainLabel, trainData, settings, 3);
@@ -160,30 +160,48 @@ settings.forestName = 'temp.bin';
 %% #######################
 % % Train the SVM in one-vs-rest (OVR) mode
 % % #######################
- bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg)];
+settings.MaxDecisionLevels = bestMaxDecisionLevels;
+settings.NumberOfCandidateFeatures = 30;
+settings.NumberOfCandidateThresholdsPerFeature = 10;
+settings.NumberOfTrees = bestNumberOfTrees;
+settings.verbose = false;
+settings.WeakLearner = 'random-hyperplane'; 
+settings.MaxThreads =  feature('NumThreads');
+settings.forestName = 'temp_leaveOneOut.bin';
 
 
-% 
-% 
-% %% Leave one out test
-% 
 for i=1:max(extractfield(AffectDataSync,'id'))
-    testData=data(extractfield(AffectDataSync,'id')==i,:);
-    testLabel=label(extractfield(AffectDataSync,'id')==i);
+    testData=single(data(extractfield(AffectDataSync,'id')==i,:));
+    testLabel=uint8(label(extractfield(AffectDataSync,'id')==i));
     
-    trainData=data(extractfield(AffectDataSync,'id')~=i,:);
-    trainLabel=label(extractfield(AffectDataSync,'id')~=i);
+    trainData=single(data(extractfield(AffectDataSync,'id')~=i,:));
+    trainLabel=uint8(label(extractfield(AffectDataSync,'id')~=i));
     
-    model = svmtrain(trainLabel, trainData, bestParam);
-    [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
+    sherwood_train(trainData', trainLabel, settings);
+  
+    probabilities = sherwood_classify(testData', settings);
+    [~,predict_label] = max(probabilities,[],1);
+    predict_label = predict_label';
+
     
-    acc(i).accuracy=accuracy(1);
+    
+%     testData=data(extractfield(AffectDataSync,'id')==i,:);
+%     testLabel=label(extractfield(AffectDataSync,'id')==i);
+%     
+%     trainData=data(extractfield(AffectDataSync,'id')~=i,:);
+%     trainLabel=label(extractfield(AffectDataSync,'id')~=i);
+%     
+%     model = svmtrain(trainLabel, trainData, bestParam);
+%     [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
+%     
+    acc(i).accuracy= sum((testLabel==predict_label))/length(testLabel);
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
     
     disp(['done with ', num2str(i)]);
 end
 
+%%
 %ave=mean(acc(~isnan(acc)));
 acc = acc(~isnan(extractfield(acc,'accuracy')));
 ave = mean(extractfield(acc,'accuracy'));
@@ -202,7 +220,7 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
 
-%% Plots!
+% Plots!
 figure;
 set(gcf,'Position',[50 50 1200 600]);
 
@@ -230,5 +248,5 @@ ylabel('P');
 % saveas(gcf, './EXP/RecognitionFused_1', 'fig');
 % save ./EXP/RecognitionFused_1
 
-saveas(gcf, './EXP/RecognitionFused_3class', 'fig');
-save ./EXP/RecognitionFused_3class
+saveas(gcf, './EXP/RecognitionFused_3class_decision', 'fig');
+save ./EXP/RecognitionFused_3class_decision
