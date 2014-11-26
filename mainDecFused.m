@@ -65,7 +65,7 @@ load ./Dataset/AffectDataSync
 
 %% CV
 
-%addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
+addpath .\libsvm-3.18\matlab
 ind = randperm(length(AffectDataSync))';
 AffectDataSync = AffectDataSync(ind,:);
  
@@ -79,18 +79,41 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 %data=zeros(length(AffectData),length(AffectData(1).data));
 
 for i=1:length(AffectDataSync)
-    datatemp(i,:)=extract_stats(AffectDataSync(i).data);
+    data(i,:)=extract_stats(AffectDataSync(i).data);
 end
 
 for i=1:length(AffectDataSync)
-    data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
+    data3d(i,:)=extract_stats(AffectDataSync(i).data3d);
 end
 
 labelList = unique(label);
 NClass = length(labelList);
  
 % % #######################
-% % Parameter selection using 3-fold cross validation
+% % Parameter selection using 3-fold cross validation 3D
+% % #######################
+bestcv3d = 0;
+i =1; j =1;
+for log2c = -2:4:46,
+    for log2g = -14:1:-10,
+        cmd3d = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
+        cv3d(i,j) = get_cv_ac_bin(label, data3d, cmd3d, nfoldCV);
+        if (cv3d(i,j) >= bestcv3d),
+            bestcv3d = cv3d(i,j); bestc3d = 2^log2c; bestg3d = 2^log2g;
+        end
+        fprintf('%g %g %g (best c=%g, g=%g, rate=%g)\n', log2c, log2g, cv3d(i,j), bestc3d, bestg3d, bestcv3d);
+        j = j+1;
+    end
+    j =1;
+    i = i + 1;
+end
+bestParam3d = ['-q -c ', num2str(bestc3d), ' -g ', num2str(bestg3d) ' -b 1'];
+figure;
+imagesc(cv3d);title('3d CV');
+
+
+% % #######################
+% % Parameter selection using 3-fold cross validation Sound
 % % #######################
 bestcv = 0;
 i =1; j =1;
@@ -107,22 +130,20 @@ for log2c = -2:4:46,
     j =1;
     i = i + 1;
 end
-imagesc(cv);
-%% #######################
-% % Train the SVM in one-vs-rest (OVR) mode
-% % #######################
- bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg)];
+bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg), ' -b 1'];
+figure;
+imagesc(cv);title('Sound CV');
 
 
-% 
-% 
 % %% Leave one out test
 % 
 parfor i=1:max(extractfield(AffectDataSync,'id'))
     testData=data(extractfield(AffectDataSync,'id')==i,:);
+    testData3d=data3d(extractfield(AffectDataSync,'id')==i,:);
     testLabel=label(extractfield(AffectDataSync,'id')==i);
     
     trainData=data(extractfield(AffectDataSync,'id')~=i,:);
+    trainData3d=data3d(extractfield(AffectDataSync,'id')~=i,:);
     trainLabel=label(extractfield(AffectDataSync,'id')~=i);
     
     model = svmtrain(trainLabel, trainData, bestParam);
@@ -131,6 +152,15 @@ parfor i=1:max(extractfield(AffectDataSync,'id'))
     acc(i).accuracy=accuracy(1);
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
+    acc(i).prob_values = prob_values;
+    
+    model3d = svmtrain(trainLabel, trainData3d, bestParam3d);
+    [predict_label3d, accuracy3d, prob_values3d] = svmpredict(testLabel, testData3d, model3d);
+    
+    acc3d(i).accuracy=accuracy3d(1);
+    acc3d(i).testLabel = testLabel;
+    acc3d(i).predict_label = predict_label3d;
+    acc3d(i).prob_values = prob_values3d;
     
     disp(['done with ', num2str(i)]);
 end
@@ -181,5 +211,5 @@ ylabel('P');
 % saveas(gcf, './EXP/RecognitionFused_1', 'fig');
 % save ./EXP/RecognitionFused_1
 
-saveas(gcf, './EXP/RecognitionFused_3class', 'fig');
-save ./EXP/RecognitionFused_3class
+saveas(gcf, './EXP/RecognitionDecFused_3class', 'fig');
+save ./EXP/RecognitionDecFused_3class
