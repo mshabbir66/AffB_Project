@@ -1,142 +1,144 @@
-clc
-close all
-clear all
-
-nfoldCV=3;
-%enum{
-LAUGHTER = 1;
-BREATHING = 2;
-OTHER = 3;
-REJECT = 3;
-%}
-
-% fs = 16000;
-% Vfs = 120;
-% K=12;
-
-% winms=750; %in ms
-% shiftms=250; %frame periodicity in ms
+% clc
+% close all
+% clear all
 % 
-% winSize  = winms/1000*fs;
-% winShift = shiftms/1000*fs;
+% nfoldCV=3;
+% %enum{
+% LAUGHTER = 1;
+% BREATHING = 2;
+% OTHER = 3;
+% REJECT = 3;
+% %}
 % 
-% winSize3d  = winms/1000*Vfs;
-% winShift3d = shiftms/1000*Vfs;
+% pause(0.1);
 % 
+% % fs = 16000;
+% % Vfs = 120;
+% % K=12;
 % 
-% load AffectBurstsSession123Cleaned
-% load antiAffectBursts
-% load ./Dataset/soundseq.mat
-% load ./Dataset/visseq.mat
-% load PCA
+% % winms=750; %in ms
+% % shiftms=250; %frame periodicity in ms
+% % 
+% % winSize  = winms/1000*fs;
+% % winShift = shiftms/1000*fs;
+% % 
+% % winSize3d  = winms/1000*Vfs;
+% % winShift3d = shiftms/1000*Vfs;
+% % 
+% % 
+% % load AffectBurstsSession123Cleaned
+% % load antiAffectBursts
+% % load ./Dataset/soundseq.mat
+% % load ./Dataset/visseq.mat
+% % load PCA
+% % 
+% % Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+% % 
+% % % Feature Extraction
+% % idcount=1;
+% % AffectDataSync = [];
+% % for j  = 1:length(Samples)
+% %     datamat=zeros(165,size(visseq(j).data{1,3},1));
+% %     for k=1:size(visseq(j).data{1,3},1)
+% %         datamat(:,k)=str2double(strsplit(visseq(j).data{1,3}{k}))';
+% %     end
+% %     i =0;
+% %     while winSize3d+ winShift3d*i < size(visseq(j).data{1,3},1)
+% %         
+% %         PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
+% %         AffectDataSync(end+1,:).data3d = PCAcoef;%extract_stats(PCAcoef);
+% %         
+% %         MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
+% %         AffectDataSync(end,:).data = MFCCs;%extract_stats(MFCCs);
+% %         
+% %         AffectDataSync(end,:).id = idcount;
+% %         AffectDataSync(end,:).label = Samples(j).type;
+% %         i  =i + 1;
+% %         
+% %     end
+% %     idcount=idcount+1;
+% %     disp(['done with the sample ', num2str(j), ' #wins in total: ' num2str(length(AffectDataSync))]);
+% % end
+% % 
+% % 
+% % save('./Dataset/AffectDataSync', 'AffectDataSync');
 % 
-% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+% load ./Dataset/AffectDataSync
 % 
-% % Feature Extraction
-% idcount=1;
-% AffectDataSync = [];
-% for j  = 1:length(Samples)
-%     datamat=zeros(165,size(visseq(j).data{1,3},1));
-%     for k=1:size(visseq(j).data{1,3},1)
-%         datamat(:,k)=str2double(strsplit(visseq(j).data{1,3}{k}))';
-%     end
-%     i =0;
-%     while winSize3d+ winShift3d*i < size(visseq(j).data{1,3},1)
-%         
-%         PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
-%         AffectDataSync(end+1,:).data3d = PCAcoef;%extract_stats(PCAcoef);
-%         
-%         MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
-%         AffectDataSync(end,:).data = MFCCs;%extract_stats(MFCCs);
-%         
-%         AffectDataSync(end,:).id = idcount;
-%         AffectDataSync(end,:).label = Samples(j).type;
-%         i  =i + 1;
-%         
-%     end
-%     idcount=idcount+1;
-%     disp(['done with the sample ', num2str(j), ' #wins in total: ' num2str(length(AffectDataSync))]);
+% %% CV
+% 
+% addpath .\libsvm-3.20
+% ind = randperm(length(AffectDataSync))';
+% AffectDataSync = AffectDataSync(ind,:);
+%  
+% LABEL=extractfield(AffectDataSync,'label')';
+% label = zeros(length(LABEL),1);
+% label(strcmp(LABEL,'Laughter')) = LAUGHTER;
+% label(strcmp(LABEL,'Breathing')) = BREATHING;
+% label(strcmp(LABEL,'Other')) = OTHER;
+% label(strcmp(LABEL,'REJECT')) = REJECT;
+% 
+% %data=zeros(length(AffectData),length(AffectData(1).data));
+% 
+% for i=1:length(AffectDataSync)
+%     data(i,:)=extract_stats(AffectDataSync(i).data);
 % end
 % 
+% for i=1:length(AffectDataSync)
+%     data3d(i,:)=extract_stats(AffectDataSync(i).data3d);
+% end
 % 
-% save('./Dataset/AffectDataSync', 'AffectDataSync');
-
-load ./Dataset/AffectDataSync
-
-%% CV
-
-addpath .\libsvm-3.18\matlab
-ind = randperm(length(AffectDataSync))';
-AffectDataSync = AffectDataSync(ind,:);
- 
-LABEL=extractfield(AffectDataSync,'label')';
-label = zeros(length(LABEL),1);
-label(strcmp(LABEL,'Laughter')) = LAUGHTER;
-label(strcmp(LABEL,'Breathing')) = BREATHING;
-label(strcmp(LABEL,'Other')) = OTHER;
-label(strcmp(LABEL,'REJECT')) = REJECT;
-
-%data=zeros(length(AffectData),length(AffectData(1).data));
-
-for i=1:length(AffectDataSync)
-    data(i,:)=extract_stats(AffectDataSync(i).data);
-end
-
-for i=1:length(AffectDataSync)
-    data3d(i,:)=extract_stats(AffectDataSync(i).data3d);
-end
-
-labelList = unique(label);
-NClass = length(labelList);
- 
-% % #######################
-% % Parameter selection using 3-fold cross validation 3D
-% % #######################
-bestcv3d = 0;
-i =1; j =1;
-for log2c = -2:4:46,
-    for log2g = -14:1:-10,
-        cmd3d = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
-        cv3d(i,j) = get_cv_ac_bin(label, data3d, cmd3d, nfoldCV);
-        if (cv3d(i,j) >= bestcv3d),
-            bestcv3d = cv3d(i,j); bestc3d = 2^log2c; bestg3d = 2^log2g;
-        end
-        fprintf('%g %g %g (best c=%g, g=%g, rate=%g)\n', log2c, log2g, cv3d(i,j), bestc3d, bestg3d, bestcv3d);
-        j = j+1;
-    end
-    j =1;
-    i = i + 1;
-end
-bestParam3d = ['-q -c ', num2str(bestc3d), ' -g ', num2str(bestg3d), ' -b 1'];
-figure;
-imagesc(cv3d);title('3d CV');
-
-
-% % #######################
-% % Parameter selection using 3-fold cross validation Sound
-% % #######################
-bestcv = 0;
-i =1; j =1;
-for log2c = -2:4:46,
-    for log2g = -14:1:-10,
-        cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g), ' -b 1'];
-        cv(i,j) = get_cv_ac_bin(label, data, cmd, nfoldCV);
-        if (cv(i,j) >= bestcv),
-            bestcv = cv(i,j); bestc = 2^log2c; bestg = 2^log2g;
-        end
-        fprintf('%g %g %g (best c=%g, g=%g, rate=%g)\n', log2c, log2g, cv(i,j), bestc, bestg, bestcv);
-        j = j+1;
-    end
-    j =1;
-    i = i + 1;
-end
-bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg), ' -b 1'];
-figure;
-imagesc(cv);title('Sound CV');
-
-
-% %% Leave one out test
+% labelList = unique(label);
+% NClass = length(labelList);
+%  
+% % % #######################
+% % % Parameter selection using 3-fold cross validation 3D
+% % % #######################
+% bestcv3d = 0;
+% i =1; j =1;
+% for log2c = -2:4:54,
+%     for log2g = -10:1:-7,
+%         cmd3d = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g), ' -b 1'];
+%         cv3d(i,j) = get_cv_ac_bin_probabilistic(label, data3d, cmd3d, nfoldCV);
+%         if (cv3d(i,j) >= bestcv3d),
+%             bestcv3d = cv3d(i,j); bestc3d = 2^log2c; bestg3d = 2^log2g;
+%         end
+%         fprintf('%g %g %g (best c=%g, g=%g, rate=%g)\n', log2c, log2g, cv3d(i,j), bestc3d, bestg3d, bestcv3d);
+%         j = j+1;
+%     end
+%     j =1;
+%     i = i + 1;
+% end
+% bestParam3d = ['-q -c ', num2str(bestc3d), ' -g ', num2str(bestg3d), ' -b 1'];
+% figure;
+% imagesc(cv3d);title('3d CV');
 % 
+% 
+% % % #######################
+% % % Parameter selection using 3-fold cross validation Sound
+% % % #######################
+% bestcv = 0;
+% i =1; j =1;
+% for log2c = -2:4:54,
+%     for log2g = -12:1:-9,
+%         cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g), ' -b 1'];
+%         cv(i,j) = get_cv_ac_bin_probabilistic(label, data, cmd, nfoldCV);
+%         if (cv(i,j) >= bestcv),
+%             bestcv = cv(i,j); bestc = 2^log2c; bestg = 2^log2g;
+%         end
+%         fprintf('%g %g %g (best c=%g, g=%g, rate=%g)\n', log2c, log2g, cv(i,j), bestc, bestg, bestcv);
+%         j = j+1;
+%     end
+%     j =1;
+%     i = i + 1;
+% end
+% bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg), ' -b 1'];
+% figure;
+% imagesc(cv);title('Sound CV');
+
+
+%% Leave one out test
+
 parfor i=1:max(extractfield(AffectDataSync,'id'))
     testData=data(extractfield(AffectDataSync,'id')==i,:);
     testData3d=data3d(extractfield(AffectDataSync,'id')==i,:);
@@ -147,7 +149,7 @@ parfor i=1:max(extractfield(AffectDataSync,'id'))
     trainLabel=label(extractfield(AffectDataSync,'id')~=i);
     
     model = svmtrain(trainLabel, trainData, bestParam);
-    [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
+    [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model,'-b 1');
     
     acc(i).accuracy=accuracy(1);
     acc(i).testLabel = testLabel;
@@ -155,7 +157,7 @@ parfor i=1:max(extractfield(AffectDataSync,'id'))
     acc(i).prob_values = prob_values;
     
     model3d = svmtrain(trainLabel, trainData3d, bestParam3d);
-    [predict_label3d, accuracy3d, prob_values3d] = svmpredict(testLabel, testData3d, model3d);
+    [predict_label3d, accuracy3d, prob_values3d] = svmpredict(testLabel, testData3d, model3d,'-b 1');
     
     acc3d(i).accuracy=accuracy3d(1);
     acc3d(i).testLabel = testLabel;
