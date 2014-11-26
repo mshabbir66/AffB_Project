@@ -138,7 +138,9 @@
 
 
 %% Leave one out test
-
+alfa=0.5;
+prob=[];
+prob3d=[];
 parfor i=1:max(extractfield(AffectDataSync,'id'))
     testData=data(extractfield(AffectDataSync,'id')==i,:);
     testData3d=data3d(extractfield(AffectDataSync,'id')==i,:);
@@ -155,6 +157,7 @@ parfor i=1:max(extractfield(AffectDataSync,'id'))
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
     acc(i).prob_values = prob_values;
+    %prob=[prob;prob_values];
     
     model3d = svmtrain(trainLabel, trainData3d, bestParam3d);
     [predict_label3d, accuracy3d, prob_values3d] = svmpredict(testLabel, testData3d, model3d,'-b 1');
@@ -163,14 +166,24 @@ parfor i=1:max(extractfield(AffectDataSync,'id'))
     acc3d(i).testLabel = testLabel;
     acc3d(i).predict_label = predict_label3d;
     acc3d(i).prob_values = prob_values3d;
+    %prob3d=[prob3d;prob_values3d];
     
     disp(['done with ', num2str(i)]);
 end
 
+%fused  = decisionFuser( prob, prob3d, 0.5);
+
 %ave=mean(acc(~isnan(acc)));
 acc = acc(~isnan(extractfield(acc,'accuracy')));
 ave = mean(extractfield(acc,'accuracy'));
-fprintf('Ave. Accuracy = %g%%\n', ave);
+fprintf('Ave. Accuracy for audio = %g%%\n', ave);
+
+acc3d = acc3d(~isnan(extractfield(acc3d,'accuracy')));
+ave3d = mean(extractfield(acc3d,'accuracy'));
+fprintf('Ave. Accuracy for 3d = %g%%\n', ave3d);
+
+
+
 predictLabels = extractfield(acc, 'predict_label');
 testLabels = extractfield(acc, 'testLabel');
 for i =1:NClass
