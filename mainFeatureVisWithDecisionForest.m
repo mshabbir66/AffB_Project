@@ -79,7 +79,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 %data=zeros(length(AffectData),length(AffectData(1).data));
 
 for i=1:length(AffectDataSync)
-    data(i,:)=[extract_stats(AffectDataSync(i).data)];%,extract_stats(AffectDataSync(i).data3d)];
+    data(i,:)=extract_stats(AffectDataSync(i).data3d);
 end
 % 
 % for i=1:length(AffectDataSync)
@@ -249,5 +249,5 @@ ylabel('P');
 % saveas(gcf, './EXP/RecognitionFused_1', 'fig');
 % save ./EXP/RecognitionFused_1
 
-saveas(gcf, './EXP/RecognitionSound_3class_decision', 'fig');
-save ./EXP/RecognitionSound_3class_decision
+saveas(gcf, './EXP/RecognitionVis_3class_decision', 'fig');
+save ./EXP/RecognitionVis_3class_decision
