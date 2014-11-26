@@ -21,29 +21,29 @@ winShift3d = shiftms/1000*Vfs;
 
 
 
-[y,fs] = wavread('..\Session4\dialog\wav\Ses04F_impro03.wav');
-y=y(:,2)';
-
-fidv = fopen('../Session4/dialog/MOCAP_rotated/Ses04F_impro03.txt','r');
-text=textscan(fidv,'%d %f %s','Delimiter','\n','Headerlines',2);
-fclose(fidv);
-
-datamat=zeros(165,size(text{1,3},1));
-for k=1:size(text{1,3},1)
-    datamat(:,k)=str2double(strsplit(text{1,3}{k}))';
-end
-
-%load ./Dataset/Ses04F_impro03Textdatamat
-
-numberOfFrames=length(y)*1000/fs;
-unseenStats = [];
-i=0;
-while winSize+ winShift*i < length(y)%winSize3d+ winShift3d*i < size(text{1,3},1)
-    PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
-    MFCCs = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
-    unseenStats(end+1,:) = [extract_stats(MFCCs) extract_stats(PCAcoef)] ;
-    i = i + 1;
-end
+% [y,fs] = wavread('..\Session4\dialog\wav\Ses04F_impro03.wav');
+% y=y(:,2)';
+% 
+% fidv = fopen('../Session4/dialog/MOCAP_rotated/Ses04F_impro03.txt','r');
+% text=textscan(fidv,'%d %f %s','Delimiter','\n','Headerlines',2);
+% fclose(fidv);
+% 
+% datamat=zeros(165,size(text{1,3},1));
+% for k=1:size(text{1,3},1)
+%     datamat(:,k)=str2double(strsplit(text{1,3}{k}))';
+% end
+% 
+% %load ./Dataset/Ses04F_impro03Textdatamat
+% 
+% numberOfFrames=length(y)*1000/fs;
+% unseenStats = [];
+% i=0;
+% while winSize+ winShift*i < length(y)%winSize3d+ winShift3d*i < size(text{1,3},1)
+%     PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
+%     MFCCs = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
+%     unseenStats(end+1,:) = [extract_stats(MFCCs) extract_stats(PCAcoef)] ;
+%     i = i + 1;
+% end
 
 %%
 %bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg)];
@@ -97,7 +97,7 @@ end
 real_label_scaled(real_label_scaled==0) = REJECT;
 
 % for i =3:length(twin)-2
-%         predict_label_r_d(i) = median(predict_label(i-2:i+2,1);
+%         predict_label_r_d(i) = median(predict_label(i-2:i+2,1));
 % end
 % 
 % temp = predict_label_r_d;
@@ -178,21 +178,29 @@ x=0;
 %while ~isDone(videoFReader)
 for k=1:readObj.NumberOfFrames
     %[I, AUDIO] = step(videoFReader);
+    
     I = read(readObj, k);
     subplot(5,1,[1,2,3]);
-    imshow(I);
+    %imshow(I);
     
     x=x+1/readObj.FrameRate;
     step=min(twin(x<twin));
     
     subplot(5,1,4);
     
-    bar(twin,predict_label);
-    title('Predicted');hold on;
+    bar(twin,predict_label==LAUGHTER,'b','EdgeColor','None');
+    hold on;
+    bar(twin,predict_label==BREATHING,'r','EdgeColor','None');
+    
+    title('Predicted');
     line([step,step],[0,1],'LineWidth',4,'Color','r');
     hold off;
+    
+    
     subplot(5,1,5);
-    bar(twin,real_label_scaled,'g');
+    bar(twin,real_label_scaled==LAUGHTER,'b','EdgeColor','None');
+    hold on
+    bar(twin,real_label_scaled==BREATHING,'r','EdgeColor','None');
     title('Real');
     line([step,step],[0,1],'LineWidth',4,'Color','r');
     hold off;
