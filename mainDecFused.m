@@ -107,7 +107,7 @@ for log2c = -2:4:46,
     j =1;
     i = i + 1;
 end
-bestParam3d = ['-q -c ', num2str(bestc3d), ' -g ', num2str(bestg3d) ' -b 1'];
+bestParam3d = ['-q -c ', num2str(bestc3d), ' -g ', num2str(bestg3d), ' -b 1'];
 figure;
 imagesc(cv3d);title('3d CV');
 
@@ -119,7 +119,7 @@ bestcv = 0;
 i =1; j =1;
 for log2c = -2:4:46,
     for log2g = -14:1:-10,
-        cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
+        cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g), ' -b 1'];
         cv(i,j) = get_cv_ac_bin(label, data, cmd, nfoldCV);
         if (cv(i,j) >= bestcv),
             bestcv = cv(i,j); bestc = 2^log2c; bestg = 2^log2g;
