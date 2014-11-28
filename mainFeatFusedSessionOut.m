@@ -5,9 +5,9 @@ clear all
 nfoldCV=3;
 %enum{
 LAUGHTER = 1;
-BREATHING = 2;
-OTHER = 3;
-REJECT = 3;
+BREATHING = 1;
+OTHER = 1;
+REJECT = 2;
 %}
 
 % fs = 16000;
@@ -156,7 +156,7 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 % 
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
-ave=100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix))
+ave=100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 fprintf('Ave. Accuracy = %g%%\n', ave);
 
 %% Plots!
@@ -187,5 +187,5 @@ ylabel('P');
 % saveas(gcf, './EXP/RecognitionFused_1', 'fig');
 % save ./EXP/RecognitionFused_1
 
-saveas(gcf, './EXP/RecognitionFusedSessionOut_3class', 'fig');
-save ./EXP/RecognitionFusedSessionOut_3class
+% saveas(gcf, './EXP/DetectionFusedSessionOut', 'fig');
+% save ./EXP/DetectionFusedSessionOut

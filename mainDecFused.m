@@ -139,9 +139,9 @@
 
 %% Leave one out test
 alfa=0.5;
-prob=[];
-prob3d=[];
-parfor i=1:max(extractfield(AffectDataSync,'id'))
+fusedLabel=[];
+prob_template=[1,3,2];
+for i=1:max(extractfield(AffectDataSync,'id'))
     testData=data(extractfield(AffectDataSync,'id')==i,:);
     testData3d=data3d(extractfield(AffectDataSync,'id')==i,:);
     testLabel=label(extractfield(AffectDataSync,'id')==i);
@@ -168,6 +168,9 @@ parfor i=1:max(extractfield(AffectDataSync,'id'))
     acc3d(i).prob_values = prob_values3d;
     %prob3d=[prob3d;prob_values3d];
     
+    fused=acc3d(i).prob_values*(1-alfa)+acc(i).prob_values*alfa;
+    [val ind]=max(fused,[],2);
+    fusedLabel=[fusedLabel prob_template(ind)];
     disp(['done with ', num2str(i)]);
 end
 
@@ -183,8 +186,8 @@ ave3d = mean(extractfield(acc3d,'accuracy'));
 fprintf('Ave. Accuracy for 3d = %g%%\n', ave3d);
 
 
-
-predictLabels = extractfield(acc, 'predict_label');
+%predictLabels = extractfield(acc, 'predict_label');
+predictLabels=fusedLabel;
 testLabels = extractfield(acc, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
@@ -197,6 +200,9 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 % 
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
+
+aveFused=100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
+fprintf('Ave. Accuracy = %g%%\n', aveFused);
 
 %% Plots!
 figure;
