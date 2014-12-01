@@ -8,8 +8,8 @@
 clear all
 
 %% Initialize variables.
-path = '.\Dataset\';
-file = 'Ses04F_impro03_candogan2.txt';
+path = '../Session4/Session4Annotation/';
+%file = 'Ses04F_impro03_candogan2.txt';
 delimiter = '\t';
 
 %% Format string for each line of text:
@@ -28,7 +28,9 @@ fileID = fopen([path file],'r');
 % This call is based on the structure of the file used to generate this
 % code. If an error occurs for a different file, try regenerating the code
 % from the Import Tool.
-dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+
+
+dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter);
 
 %% Close the text file.
 fclose(fileID);
