@@ -139,10 +139,13 @@ imagesc(cv);title(['CV for leave session' num2str(k) ' out']);
     disp(['done with ', num2str(k)]);
 end
 
-%ave=mean(acc(~isnan(acc)));
+
 acc = acc(~isnan(extractfield(acc,'accuracy')));
 %ave = mean(extractfield(acc,'accuracy'));
 %fprintf('Ave. Accuracy = %g%%\n', ave);
+ave=100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
+fprintf('Ave. Accuracy = %g%%\n', ave);
+
 predictLabels = extractfield(acc, 'predict_label');
 testLabels = extractfield(acc, 'testLabel');
 for i =1:NClass
@@ -156,8 +159,6 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 % 
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
-ave=100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
-fprintf('Ave. Accuracy = %g%%\n', ave);
 
 %% Plots!
 figure;
