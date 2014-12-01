@@ -176,7 +176,10 @@ set(gcf,'Position',[50 50 1200 600]);
 
 %subplot(1,3,1)
 bar3(ConfusionMatrix);
-title(['Confusion Matrix' ' Acc: ' num2str(ave_acc) '% Precision: ' num2str(precision) '% Recall: ' num2str(recall) '%']);
+title(['Confusion Matrix, ' ' Acc: ' num2str(ave_acc) '% Precision: ' num2str(precision) '% Recall: ' num2str(recall) '%']);
+ax=gca;
+set(ax,'XTickLabel',{'Affect Burst','Reject'});
+set(ax,'YTickLabel',{'Affect Burst','Reject'});
 xlabel('GT');
 ylabel('P')
 % subplot(1,3,2)
