@@ -78,7 +78,7 @@ label(strcmp(LABEL,'Other')) = OTHER;
 label(strcmp(LABEL,'REJECT')) = REJECT;
 
 %data=zeros(length(AffectData),length(AffectData(1).data));
-
+datatemp=[];
 for i=1:length(AffectDataSync)
     datatemp(i,:)=extract_stats(AffectDataSync(i).data);
 end
@@ -143,8 +143,7 @@ end
 acc = acc(~isnan(extractfield(acc,'accuracy')));
 %ave = mean(extractfield(acc,'accuracy'));
 %fprintf('Ave. Accuracy = %g%%\n', ave);
-ave=100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
-fprintf('Ave. Accuracy = %g%%\n', ave);
+
 
 predictLabels = extractfield(acc, 'predict_label');
 testLabels = extractfield(acc, 'testLabel');
@@ -160,26 +159,37 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 % 
 % %save(['exp_' num2str(winms) '_' num2str(shiftms) '_D'], 'cv', 'acc', 'ave', 'bestParam', 'bestcv', 'nfoldCV' );
 
-%% Plots!
+%% Plots and metrics!
+TP=ConfusionMatrix(1,1);
+FP=ConfusionMatrix(1,2);
+TN=ConfusionMatrix(2,2);
+FN=ConfusionMatrix(2,1);
+
+ave_acc=100*(TP+TN)/(TP+FP+TN+FN);
+precision=100*TP/(TP+FP);
+recall=100*TP/(TP+FN);
+%ave=100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
+fprintf('Ave. Accuracy = %g%%\n', ave_acc);
+
 figure;
 set(gcf,'Position',[50 50 1200 600]);
 
-subplot(1,3,1)
+%subplot(1,3,1)
 bar3(ConfusionMatrix);
-title('Confusion Matrix')
+title(['Confusion Matrix' ' Acc: ' num2str(ave_acc) '% Precision: ' num2str(precision) '% Recall: ' num2str(recall) '%']);
 xlabel('GT');
 ylabel('P')
-subplot(1,3,2)
-bar3(ConfusionMatrixSensitivity);
-title('Confusion Matrix(Sensitivity)')
-xlabel('GT');
-ylabel('P');
-subplot(1,3,3)
-
-bar3(ConfusionMatrixPrecision);
-title('Confusion Matrix(Precision)')
-xlabel('GT');
-ylabel('P');
+% subplot(1,3,2)
+% bar3(ConfusionMatrixSensitivity);
+% title('Confusion Matrix(Sensitivity)')
+% xlabel('GT');
+% ylabel('P');
+% subplot(1,3,3)
+% 
+% bar3(ConfusionMatrixPrecision);
+% title('Confusion Matrix(Precision)')
+% xlabel('GT');
+% ylabel('P');
 
 
 % saveas(gcf, './EXP/DetectionFused_1', 'fig');
