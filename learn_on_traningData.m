@@ -1,4 +1,4 @@
-function [ model ] = learn_on_traningData(trainingData, trainingLabel, cRange, gRange, nfoldCV )
+function [ model, bestParam, cv ] = learn_on_traningData(trainData, trainLabel, cRange, gRange, nfoldCV )
 %UNTÝTLED2 Summary of this function goes here
 %   Detailed explanation goes here
 % % #######################
@@ -19,8 +19,7 @@ for log2c = cRange(1):cRange(2):cRange(3),
     j =1;
     i = i + 1;
 end
-figure;
-imagesc(cv);
+
 %% #######################
 % % Train the SVM in one-vs-rest (OVR) mode
 % % #######################
