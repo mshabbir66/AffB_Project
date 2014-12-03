@@ -52,7 +52,7 @@ if(modality==1) %audio
         data(i,:)=extract_stats(AffectDataSync(i).data);
     end
     cRange=[-2 4 34];
-    gRange=[-13 1 -7];
+    gRange=[-13 1 -8];
     saveName2='Audio';
 elseif(modality==2) %video
     for i=1:length(AffectDataSync)
