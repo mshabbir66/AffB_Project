@@ -2,6 +2,11 @@ clc
 close all
 clear all
 
+% AffectDataSync = createAffectDataSync
+% save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
+
+load ./Dataset/AffectDataSync+sesNumber
+
 nfoldCV = 3;
 nfold = 10;
 
@@ -17,14 +22,12 @@ if(classifierType==1)
     BREATHING = 1;
     %OTHER = 1;
     REJECT = 2;
-elseif(classifierType==2)
+else
     LAUGHTER = 1;
     BREATHING = 2;
     %OTHER = 1;
     REJECT = 3;
 end
-
-load ./Dataset/AffectDataSync+sesNumber
 
 %% label and feature extraction
 LABEL=extractfield(AffectDataSync,'label')';
@@ -94,8 +97,13 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 %% plot and metrics
 bar3(ConfusionMatrix');
 ax = gca;
-set(ax,'XTickLabel',{'Laughter','Breathing','Reject'});
-set(ax,'YTickLabel',{'Laughter','Breathing','Reject'});
+if(classifierType==1)
+    axlabels={'Laughter','Reject'};
+else
+    axlabels={'Laughter','Breathing','Reject'};
+end
+set(ax,'XTickLabel',axlabels);
+set(ax,'YTickLabel',axlabels);
 xlabel('GT');
 ylabel('P');
 
