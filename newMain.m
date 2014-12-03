@@ -22,7 +22,7 @@ if(classifierType==1)
     BREATHING = 1;
     %OTHER = 1;
     REJECT = 2;
-    axlabels={'Laughter','Reject'};
+    axlabels={'Affect Burst','Reject'};
     saveName1='Detection';
 else
     LAUGHTER = 1;
@@ -38,8 +38,11 @@ LABEL=extractfield(AffectDataSync,'label')';
 label = zeros(length(LABEL),1);
 label(strcmp(LABEL,'Laughter')) = LAUGHTER;
 label(strcmp(LABEL,'Breathing')) = BREATHING;
-%label(strcmp(LABEL,'Other')) = OTHER;
 label(strcmp(LABEL,'REJECT')) = REJECT;
+label(strcmp(LABEL,'Other')) = [];%OTHER
+
+labelList = unique(label);
+NClass = length(labelList);
 
 if(modality==1) %audio
     for i=1:length(AffectDataSync)
