@@ -7,6 +7,9 @@ clear all
 
 load ./Dataset/AffectDataSync+sesNumber
 
+% Removing Other class
+AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
+
 nfoldCV = 3;
 nfold = 10;
 
@@ -39,7 +42,7 @@ label = zeros(length(LABEL),1);
 label(strcmp(LABEL,'Laughter')) = LAUGHTER;
 label(strcmp(LABEL,'Breathing')) = BREATHING;
 label(strcmp(LABEL,'REJECT')) = REJECT;
-label(strcmp(LABEL,'Other')) = [];%OTHER
+%label(strcmp(LABEL,'Other')) = OTHER
 
 labelList = unique(label);
 NClass = length(labelList);
