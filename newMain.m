@@ -95,8 +95,6 @@ for i=1:nfold % nfold test
     disp(['done fold ', num2str(i)]);
 end
 
-
-
 acc = acc(~isnan(extractfield(acc,'accuracy')));
 
 %% confusion matrix
