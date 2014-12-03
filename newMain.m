@@ -14,7 +14,7 @@ nfoldCV = 3;
 nfold = 10;
 
 % detection 1, recognition 2
-classifierType=1;
+classifierType=2;
 
 % audio 1, video 2, feature fusion 3
 modality=1;
@@ -73,19 +73,28 @@ end
 
 %% nfold test
 CV(nfold).model=[];
-len=length(label);
+IDs=unique(extractfield(AffectDataSync,'id'));
+len=length(IDs);
 rand_ind = randperm(len);
+rand_id = IDs(rand_ind);
 figure;
+train_ind=[];test_ind=[];
 for i=1:nfold % nfold test
-  test_ind=rand_ind([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
-  train_ind = [1:len]';
-  train_ind(test_ind) = [];
+  test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
+  train_id = rand_id;
+  train_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]) = [];
   
-  trainLabel=label(train_ind);
+  for k=1:length(train_id)
+      train_ind=[train_ind;find(extractfield(AffectDataSync,'id')==train_id(k))'];
+  end
   trainData=data(train_ind,:);
+  trainLabel=label(train_ind);
   
-  testLabel=label(test_ind);
+  for k=1:length(test_id)
+      test_ind=[test_ind;find(extractfield(AffectDataSync,'id')==test_id(k))'];
+  end
   testData=data(test_ind,:);
+  testLabel=label(test_ind);
   
   [CV(i).model, CV(i).bestParam, CV(i).grid ]= learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV );
   [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, CV(i).model);
