@@ -77,7 +77,6 @@ label(strcmp(LABEL,'Breathing')) = BREATHING;
 label(strcmp(LABEL,'Other')) = OTHER;
 label(strcmp(LABEL,'REJECT')) = REJECT;
 
-%data=zeros(length(AffectData),length(AffectData(1).data));
 datatemp=[];
 for i=1:length(AffectDataSync)
     datatemp(i,:)=extract_stats(AffectDataSync(i).data);
@@ -87,6 +86,7 @@ for i=1:length(AffectDataSync)
     data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
 end
 
+
 labelList = unique(label);
 NClass = length(labelList);
 
@@ -94,7 +94,7 @@ NClass = length(labelList);
 % 
 % %% Leave one Session out test
 % 
-for k=1:3
+for k=1:4
     
     testData=data(extractfield(AffectDataSync,'sesNumber')==k,:);
     testLabel=label(extractfield(AffectDataSync,'sesNumber')==k);
@@ -110,6 +110,10 @@ bestcv = 0;
 i =1; j =1;
 for log2c = -2:4:46,
     for log2g = -14:1:-10,
+% for log2c = -2:4:34,
+%     for log2g = -13:1:-7,
+% for log2c = -2:4:34,
+%     for log2g = -10:1:-5,
         cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
         cv(i,j) = get_cv_ac_bin(trainLabel, trainData, cmd, nfoldCV);
         if (cv(i,j) >= bestcv),
@@ -161,9 +165,9 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 
 %% Plots and metrics!
 TP=ConfusionMatrix(1,1);
-FP=ConfusionMatrix(1,2);
+FP=ConfusionMatrix(2,1);
 TN=ConfusionMatrix(2,2);
-FN=ConfusionMatrix(2,1);
+FN=ConfusionMatrix(1,2);
 
 ave_acc=100*(TP+TN)/(TP+FP+TN+FN);
 precision=100*TP/(TP+FP);
@@ -175,7 +179,7 @@ figure;
 set(gcf,'Position',[50 50 1200 600]);
 
 %subplot(1,3,1)
-bar3(ConfusionMatrix);
+bar3(ConfusionMatrix');
 title(['Confusion Matrix, ' ' Acc: ' num2str(ave_acc) '% Precision: ' num2str(precision) '% Recall: ' num2str(recall) '%']);
 ax=gca;
 set(ax,'XTickLabel',{'Affect Burst','Reject'});

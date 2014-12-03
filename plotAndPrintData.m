@@ -1,4 +1,4 @@
-bar3(ConfusionMatrix);
+bar3(ConfusionMatrix');
 ax = gca;
 set(ax,'XTickLabel',{'Laughter','Breathing','Reject'});
 set(ax,'YTickLabel',{'Laughter','Breathing','Reject'});
