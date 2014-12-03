@@ -73,7 +73,7 @@ CV(nfold).model=[];
 len=length(label);
 rand_ind = randperm(len);
 figure;
-for i=1:nfold % Cross training : folding
+for i=1:nfold % nfold test
   test_ind=rand_ind([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
   train_ind = [1:len]';
   train_ind(test_ind) = [];
