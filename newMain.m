@@ -13,8 +13,10 @@ AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 nfoldCV = 3;
 nfold = 10;
 
+for a=1:2
+
 % detection 1, recognition 2
-classifierType=1;
+classifierType=a;
 
 % audio 1, video 2, feature fusion 3
 modality=1;
@@ -138,3 +140,4 @@ title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2st
 saveName=['./EXPproper/' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
+end
