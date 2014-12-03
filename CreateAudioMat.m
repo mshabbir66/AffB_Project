@@ -2,7 +2,7 @@ clc
 close all
 clear all
 
-load AffectBurstsSession123Cleaned
+load AffectBurstsSession1234Cleaned
 load antiAffectBursts
 Samples = [AffectBursts;antiAffectBursts'];
 
@@ -21,6 +21,8 @@ for i = 1:length(Samples)
         case 2
             y = y(startFrame:endFrame,2);
         case 3
+            y = y(startFrame:endFrame,2);
+        case 4
             y = y(startFrame:endFrame,2);
     end  
     soundseq(i).data = y';
