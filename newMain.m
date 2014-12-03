@@ -22,11 +22,13 @@ if(classifierType==1)
     BREATHING = 1;
     %OTHER = 1;
     REJECT = 2;
+    axlabels={'Laughter','Reject'};
 else
     LAUGHTER = 1;
     BREATHING = 2;
     %OTHER = 1;
     REJECT = 3;
+    axlabels={'Laughter','Breathing','Reject'};
 end
 
 %% label and feature extraction
@@ -97,11 +99,6 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 %% plot and metrics
 bar3(ConfusionMatrix');
 ax = gca;
-if(classifierType==1)
-    axlabels={'Laughter','Reject'};
-else
-    axlabels={'Laughter','Breathing','Reject'};
-end
 set(ax,'XTickLabel',axlabels);
 set(ax,'YTickLabel',axlabels);
 xlabel('GT');
