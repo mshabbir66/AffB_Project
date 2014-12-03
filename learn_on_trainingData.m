@@ -1,4 +1,4 @@
-function [ model, bestParam, cv ] = learn_on_traningData(trainData, trainLabel, cRange, gRange, nfoldCV )
+function [ model, bestParam, cv ] = learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV )
 %UNTÝTLED2 Summary of this function goes here
 %   Detailed explanation goes here
 % % #######################

@@ -84,7 +84,7 @@ for i=1:nfold % nfold test
   testLabel=label(test_ind);
   testData=data(test_ind,:);
   
-  [CV(i).model, CV(i).bestParam, CV(i).grid ]= learn_on_traningData(trainData, trainLabel, cRange, gRange, nfoldCV );
+  [CV(i).model, CV(i).bestParam, CV(i).grid ]= learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV );
   [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, CV(i).model);
     acc(i).accuracy=accuracy(1);
     acc(i).testLabel = testLabel;
