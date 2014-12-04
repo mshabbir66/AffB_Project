@@ -19,7 +19,7 @@ load AffectBurstsSession1234Cleaned
 load antiAffectBursts
 load ./Dataset/soundseq.mat
 load ./Dataset/visseq.mat
-load PCA
+load PCA_ses1234.mat
 
 Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
