@@ -80,8 +80,8 @@ len=length(IDs);
 rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
 figure;
-train_ind=[];test_ind=[];
 for i=1:nfold % nfold test
+  train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
   train_id = rand_id;
   train_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]) = [];
