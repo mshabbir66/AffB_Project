@@ -2,10 +2,10 @@ clc
 close all
 clear all
 
-AffectDataSync = createAffectDataSync;
+% AffectDataSync = createAffectDataSync;
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
 
-%load ./Dataset/AffectDataSync+sesNumber
+load ./Dataset/AffectDataSync+sesNumber
 
 % Removing Other class
 AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
@@ -57,7 +57,7 @@ for i=1:length(AffectDataSync)
     data3d(i,:)=extract_stats(AffectDataSync(i).data3d);
 end
 cRange3d=[-2 4 34];
-gRange3d=[-13 1 -8];
+gRange3d=[-11 1 -7];
 
 saveName2='DecFused';
 
@@ -101,7 +101,7 @@ for i=1:nfold % nfold test
     subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
     
     [CV3d(i).model, CV3d(i).bestParam, CV3d(i).grid ]= learn_on_trainingData(trainData3d, trainLabel, cRange3d, gRange3d, nfoldCV, 1);
-  [predict_label3d, accuracy3d, prob_values3d] = svmpredict(testLabel, testData3d, CV(i).model,'-b 1');
+  [predict_label3d, accuracy3d, prob_values3d] = svmpredict(testLabel, testData3d, CV3d(i).model,'-b 1');
     acc3d(i).accuracy=accuracy3d(1);
     acc3d(i).testLabel = testLabel;
     acc3d(i).predict_label = predict_label3d;
@@ -116,12 +116,16 @@ end
 acc = acc(~isnan(extractfield(acc,'accuracy')));
 acc3d = acc3d(~isnan(extractfield(acc3d,'accuracy')));
 
-    fused=prob3d*(1-alfa)+acc(i).prob*alfa;
-    [val ind]=max(fused,[],2);
-    fusedLabel=[fusedLabel prob_template(ind)];
+
 
 %% confusion matrix
-predictLabels = extractfield(acc, 'predict_label');
+k=0;
+for alfa=0:0.01:1
+    k=k+1;
+    fused=prob3d*(1-alfa)+prob*alfa;
+    [val ind]=max(fused,[],2);
+    fusedLabel=ind;
+predictLabels = fusedLabel;
 testLabels = extractfield(acc, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
@@ -143,10 +147,14 @@ ylabel('P');
 Precision = mean(diag(ConfusionMatrixPrecision));
 Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 
-ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
-title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
+ave_acc(k)=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
+title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
-% saveName=['./EXPproper/' saveName1,saveName2];
-% saveas(gcf, saveName, 'fig');
-% save(saveName);
+end
+figure;
+plot(0:0.1:1,ave_acc);
+
+saveName=['./EXPproper/' saveName1,saveName2];
+saveas(gcf, saveName, 'fig');
+save(saveName);
     
