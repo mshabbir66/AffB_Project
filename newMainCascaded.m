@@ -14,7 +14,7 @@ nfold = 10;
 classifierType=2;
 
 % audio 1, video 2, feature fusion 3
-modality=1;
+modality=3;
 
 
 if(classifierType==1)
@@ -40,6 +40,7 @@ label(strcmp(LABEL,'Laughter')) = LAUGHTER;
 label(strcmp(LABEL,'Breathing')) = BREATHING;
 label(strcmp(LABEL,'REJECT')) = REJECT;
 label(strcmp(LABEL,'Other')) = [];%OTHER
+AffectDataSync(strcmp(LABEL,'Other')) = [];
 
 labelList = unique(label);
 NClass = length(labelList);
@@ -70,39 +71,95 @@ end
 
 %% nfold test
 CV(nfold).model=[];
-len=length(label);
+
+IDs=unique(extractfield(AffectDataSync,'id'));
+len=length(IDs);
 rand_ind = randperm(len);
+load ('rand_ind.mat','rand_ind');
+rand_id = IDs(rand_ind);
+
 figure;
 for i=1:nfold % nfold test
-  test_ind=rand_ind([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
-  train_ind = [1:len]';
-  train_ind(test_ind) = [];
+%  test_ind=rand_ind([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
+%  train_ind = (1:len)';
+%  train_ind(test_ind) = [];
+  train_ind=[];test_ind=[];
+  test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
+  train_id = rand_id;
+  train_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]) = [];
   
-  trainLabel=label(train_ind);
-  trainData=data(train_ind,:);
+  for k=1:length(train_id)
+      train_ind=[train_ind;find(extractfield(AffectDataSync,'id')==train_id(k))'];
+  end
+  for k=1:length(test_id)
+      test_ind=[test_ind;find(extractfield(AffectDataSync,'id')==test_id(k))'];
+  end
+
+
+  trainLabelDetect=label(train_ind);
+  trainLabelDetect(trainLabelDetect == LAUGHTER) = 1;
+  trainLabelDetect(trainLabelDetect == BREATHING) = 1;
+  trainLabelDetect(trainLabelDetect == REJECT) = 2;
   
-  testLabel=label(test_ind);
-  testData=data(test_ind,:);
+  trainDataDetect=data(train_ind,:);
   
-  [CV(i).model, CV(i).bestParam, CV(i).grid ]= learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV );
+  testLabelDetect=label(test_ind);
+  testLabelDetect(testLabelDetect == LAUGHTER) = 1;
+  testLabelDetect(testLabelDetect == BREATHING) = 1;
+  testLabelDetect(testLabelDetect == REJECT) = 2;
+ 
+  testDataDetect=data(test_ind,:);
   
-  [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, CV(i).model);
-    acc(i).accuracy=accuracy(1);
-    acc(i).testLabel = testLabel;
-    acc(i).predict_label = predict_label;
+  trainLabelRec = label(train_ind);
+  trainDataRec=data(train_ind,:);
+  trainDataRec(trainLabelRec == REJECT,:) = [];
+  trainLabelRec(trainLabelRec == REJECT) = [];
+
+%   testLabelRec = label(test_ind);
+%   testDataRec=data(test_ind,:);
+%   testDataRec(testLabelRec == REJECT,:) = [];
+%   testLabelRec(testLabelRec == REJECT) = [];
+  
+  [CV1(i).model, CV1(i).bestParam, CV1(i).grid ]= learn_on_trainingData(trainDataDetect, trainLabelDetect, cRange, gRange, nfoldCV );
+  [CV2(i).model, CV2(i).bestParam, CV2(i).grid ]= learn_on_trainingData(trainDataRec, trainLabelRec, cRange, gRange, nfoldCV );
+
+  [predict_label, accuracy, prob_values] = svmpredict(testLabelDetect, testDataDetect, CV1(i).model);
+    acc1(i).accuracy=accuracy(1);
+    acc1(i).testLabel = testLabelDetect;
+    acc1(i).predict_label = predict_label;
+
+   testLabelRec = label(test_ind);
+   testLabelRec = testLabelRec(acc1(i).predict_label==1);
+   testDataRec = data(test_ind,:);
+   testDataRec = testDataRec(acc1(i).predict_label==1,:);
+   
+   
+  [predict_label, accuracy, prob_values] = svmpredict(testLabelRec, testDataRec, CV2(i).model);
+    acc2(i).accuracy=accuracy(1);
+    acc2(i).testLabel = testLabelRec;
+    acc2(i).predict_label = predict_label;
     
-    subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);
+    acc3(i).testLabel = label(test_ind);
+
     
+    subplot(ceil(nfold/5),5,i);imagesc(CV1(i).grid);
+    drawnow;
     disp(['done fold ', num2str(i)]);
 end
 
-
-
-acc = acc(~isnan(extractfield(acc,'accuracy')));
+%acc = acc1(~isnan(extractfield(acc1,'accuracy')));
 
 %% confusion matrix
-predictLabels = extractfield(acc, 'predict_label');
-testLabels = extractfield(acc, 'testLabel');
+for i = 1:length(acc1)
+acc3(i).predict_label = acc1(i).predict_label;
+acc3(i).predict_label(acc3(i).predict_label==2) = 3;
+acc3(i).predict_label(acc3(i).predict_label==1) = acc2(i).predict_label;
+
+end
+
+predictLabels = extractfield(acc3, 'predict_label');
+testLabels = extractfield(acc3, 'testLabel');
+
 for i =1:NClass
     for j = 1:NClass
     ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);
@@ -126,6 +183,6 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
-saveName=['./EXPproper/' saveName1,saveName2];
+saveName=['./EXPproper/Cascade' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
