@@ -13,10 +13,10 @@ AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 nfoldCV = 3;
 nfold = 10;
 
-for a=1:2
+
 
 % detection 1, recognition 2
-classifierType=a;
+classifierType=2;
 
 % audio 1, video 2, feature fusion 3
 modality=1;
@@ -104,7 +104,7 @@ for i=1:nfold % nfold test
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
     
-    subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);
+    subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
     
     disp(['done fold ', num2str(i)]);
 end
@@ -140,4 +140,3 @@ title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2st
 saveName=['./EXPproper/' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
-end
