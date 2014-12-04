@@ -62,7 +62,7 @@ elseif(modality==2) %video
         data(i,:)=extract_stats(AffectDataSync(i).data);
     end
     cRange=[-2 4 34];
-    gRange=[-10 1 -5];
+    gRange=[-13 1 -8];
     saveName2='Video';
 else %fused
     for i=1:length(AffectDataSync)
@@ -70,7 +70,7 @@ else %fused
         data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
     end
     cRange=[-2 4 46];
-    gRange=[-14 1 -10];
+    gRange=[-13 1 -10];
     saveName2='Fused';
 end
 
