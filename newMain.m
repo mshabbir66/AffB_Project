@@ -13,14 +13,13 @@ AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 nfoldCV = 3;
 nfold = 10;
 
-for a=2:3
-    for b=1:2
+
 
 % detection 1, recognition 2
-classifierType=b;
+classifierType=2;
 
 % audio 1, video 2, feature fusion 3
-modality=a;
+modality=3;
 
 
 if(classifierType==1)
@@ -59,7 +58,7 @@ if(modality==1) %audio
     saveName2='Audio';
 elseif(modality==2) %video
     for i=1:length(AffectDataSync)
-        data(i,:)=extract_stats(AffectDataSync(i).data);
+        data(i,:)=extract_stats(AffectDataSync(i).data3d);
     end
     cRange=[-2 4 34];
     gRange=[-13 1 -8];
@@ -142,5 +141,3 @@ saveName=['./EXPproper/' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
     
-    end
-end
