@@ -1,4 +1,4 @@
-function [ model, bestParam, cv ] = learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV )
+function [ model, bestParam, cv ] = learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV, probEnable )
 %UNTÝTLED2 Summary of this function goes here
 %   Detailed explanation goes here
 % % #######################
@@ -23,8 +23,11 @@ end
 %% #######################
 % % Train the SVM in one-vs-rest (OVR) mode
 % % #######################
- bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg)];
-
+ if(probEnable)
+    bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg) ' -b 1'];
+ else
+    bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg)];
+ end
     
     model = svmtrain(trainLabel, trainData, bestParam);
 

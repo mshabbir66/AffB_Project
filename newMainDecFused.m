@@ -18,9 +18,6 @@ nfold = 10;
 % detection 1, recognition 2
 classifierType=1;
 
-% audio 1, video 2, feature fusion 3
-modality=1;
-
 
 if(classifierType==1)
     LAUGHTER = 1;
@@ -49,37 +46,30 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 labelList = unique(label);
 NClass = length(labelList);
 
-if(modality==1) %audio
-    for i=1:length(AffectDataSync)
-        data(i,:)=extract_stats(AffectDataSync(i).data);
-    end
-    cRange=[-2 4 34];
-    gRange=[-13 1 -8];
-    saveName2='Audio';
-elseif(modality==2) %video
-    for i=1:length(AffectDataSync)
-        data(i,:)=extract_stats(AffectDataSync(i).data3d);
-    end
-    cRange=[-2 4 34];
-    gRange=[-13 1 -8];
-    saveName2='Video';
-else %fused
-    for i=1:length(AffectDataSync)
-        datatemp(i,:)=extract_stats(AffectDataSync(i).data);
-        data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
-    end
-    cRange=[-2 4 46];
-    gRange=[-13 1 -10];
-    saveName2='Fused';
+
+for i=1:length(AffectDataSync)
+    data(i,:)=extract_stats(AffectDataSync(i).data);
 end
+cRange=[-2 4 34];
+gRange=[-13 1 -8];
+
+for i=1:length(AffectDataSync)
+    data3d(i,:)=extract_stats(AffectDataSync(i).data3d);
+end
+cRange3d=[-2 4 34];
+gRange3d=[-13 1 -8];
+
+saveName2='DecFused';
+
 
 %% nfold test
 CV(nfold).model=[];
+CV3d(nfold).model=[];
 IDs=unique(extractfield(AffectDataSync,'id'));
 len=length(IDs);
 load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
-figure;
+prob=[];prob3d=[];
 for i=1:nfold % nfold test
   train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
@@ -90,26 +80,45 @@ for i=1:nfold % nfold test
       train_ind=[train_ind;find(extractfield(AffectDataSync,'id')==train_id(k))'];
   end
   trainData=data(train_ind,:);
+  trainData3d=data3d(train_ind,:);
   trainLabel=label(train_ind);
   
   for k=1:length(test_id)
       test_ind=[test_ind;find(extractfield(AffectDataSync,'id')==test_id(k))'];
   end
   testData=data(test_ind,:);
+  testData3d=data3d(test_ind,:);
   testLabel=label(test_ind);
   
-  [CV(i).model, CV(i).bestParam, CV(i).grid ]= learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV, 0);
-  [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, CV(i).model);
+  [CV(i).model, CV(i).bestParam, CV(i).grid ]= learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV, 1);
+  [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, CV(i).model,'-b 1');
     acc(i).accuracy=accuracy(1);
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
-    
+    acc(i).prob_values = prob_values;
+    prob=[prob;prob_values];
+    figure(1);
     subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
+    
+    [CV3d(i).model, CV3d(i).bestParam, CV3d(i).grid ]= learn_on_trainingData(trainData3d, trainLabel, cRange3d, gRange3d, nfoldCV, 1);
+  [predict_label3d, accuracy3d, prob_values3d] = svmpredict(testLabel, testData3d, CV(i).model,'-b 1');
+    acc3d(i).accuracy=accuracy3d(1);
+    acc3d(i).testLabel = testLabel;
+    acc3d(i).predict_label = predict_label3d;
+    acc3d(i).prob_values = prob_values3d;
+    prob3d=[prob3d;prob_values3d];
+    figure(2);
+    subplot(ceil(nfold/5),5,i);imagesc(CV3d(i).grid);drawnow;
     
     disp(['done fold ', num2str(i)]);
 end
 
 acc = acc(~isnan(extractfield(acc,'accuracy')));
+acc3d = acc3d(~isnan(extractfield(acc3d,'accuracy')));
+
+    fused=prob3d*(1-alfa)+acc(i).prob*alfa;
+    [val ind]=max(fused,[],2);
+    fusedLabel=[fusedLabel prob_template(ind)];
 
 %% confusion matrix
 predictLabels = extractfield(acc, 'predict_label');
