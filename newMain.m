@@ -13,13 +13,14 @@ AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 nfoldCV = 3;
 nfold = 10;
 
-
+for a=2:3
+    for b=1:2
 
 % detection 1, recognition 2
-classifierType=2;
+classifierType=b;
 
 % audio 1, video 2, feature fusion 3
-modality=1;
+modality=a;
 
 
 if(classifierType==1)
@@ -77,7 +78,7 @@ end
 CV(nfold).model=[];
 IDs=unique(extractfield(AffectDataSync,'id'));
 len=length(IDs);
-rand_ind = randperm(len);
+load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
 figure;
 for i=1:nfold % nfold test
@@ -140,3 +141,6 @@ title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2st
 saveName=['./EXPproper/' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
+    
+    end
+end
