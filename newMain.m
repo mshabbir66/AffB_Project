@@ -19,7 +19,7 @@ nfold = 10;
 classifierType=1;
 
 % audio 1, video 2, feature fusion 3
-modality=2;
+modality=3;
 
 
 if(classifierType==1)
@@ -61,7 +61,7 @@ elseif(modality==2) %video
         data(i,:)=extract_stats(AffectDataSync(i).data3d);
     end
     cRange=[-2 4 34];
-    gRange=[-13 1 -8];
+    gRange=[-11 1 -7];
     saveName2='Video';
 else %fused
     for i=1:length(AffectDataSync)
@@ -137,7 +137,7 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
-% saveName=['./EXPproper/' saveName1,saveName2];
-% saveas(gcf, saveName, 'fig');
-% save(saveName);
+saveName=['./EXPproper/' saveName1,saveName2];
+saveas(gcf, saveName, 'fig');
+save(saveName);
     
