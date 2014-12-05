@@ -19,6 +19,7 @@ textStrings(idx) = {'   '};
 [x,y] = meshgrid(1:3);   %# Create x and y coordinates for the strings
 hStrings = text(x(:),y(:),textStrings(:),...      %# Plot the strings
                 'HorizontalAlignment','center');
+set(gca,'Clim',[10,700]);
 midValue = mean(get(gca,'CLim'));  %# Get the middle value of the color range
 textColors = repmat(ConfusionMatrix(:) > midValue,1,3);  %# Choose white or black for the
                                              %#   text color of the strings so

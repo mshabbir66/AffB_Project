@@ -9,11 +9,12 @@ matNames={ 'RecognitionAudio.mat' ; ...
            'CascadeRecognitionAudio.mat' ; ... 
            'CascadeRecognitionVideo.mat' ; ...
            'CascadeRecognitionFused.mat' ; ...
-           'CascadeRecognitionDecFused.mat' };
+           'CascadeRecognitionDecisionFusion.mat' };
        
 figure('Position',[50 50 1000 600]);
 for i=1:8
     load(['EXPproper/' matNames{i}],'ConfusionMatrix');
     subplot(2,4,i);
-    plotConfusionMat;
+    plotConfusionMat;title(['Accuracy: ' num2str(100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix)),'%.2f') '%']);
+    axis equal;axis tight;
 end
