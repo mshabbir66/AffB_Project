@@ -128,8 +128,8 @@ acc = acc(~isnan(extractfield(acc,'accuracy')));
 acc3d = acc3d(~isnan(extractfield(acc3d,'accuracy')));
 
 
-
 %% confusion matrix
+ConfusionMatrices(101).confdata=zeros(NClass);
 k=0;
 for alfa=0:0.01:1
     k=k+1;
@@ -140,11 +140,11 @@ predictLabels = fusedLabel;
 testLabels = extractfield(acc, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
-    ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);
+    ConfusionMatrices(k).confdata(i,j) = sum(predictLabels(testLabels==i)==j);
     end
 end
-ConfusionMatrixSensitivity = ConfusionMatrix./(sum(ConfusionMatrix,2)*ones(1,NClass));
-ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,1));
+ConfusionMatrixSensitivity = ConfusionMatrices(k).confdata./(sum(ConfusionMatrices(k).confdata,2)*ones(1,NClass));
+ConfusionMatrixPrecision = ConfusionMatrices(k).confdata./(ones(NClass,1)*sum(ConfusionMatrices(k).confdata,1));
 
 %% plot and metrics
 % figure;
@@ -158,14 +158,16 @@ ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,
 Precision(k) = mean(diag(ConfusionMatrixPrecision));
 Sensitivity(k) = mean(diag(ConfusionMatrixSensitivity));
 
-ave_acc(k)=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
+ave_acc(k)=sum(diag(ConfusionMatrices(k).confdata))/sum(sum(ConfusionMatrices(k).confdata));
 % title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
 end
-[maxval, maxind]=max(ave_acc);
+[maxacc, maxind]=max(ave_acc);
 figure;
 xax=0:0.01:1;
-plot(xax,ave_acc);title(['maximum accuracy ' num2str(maxval) '% for alfa='  num2str(xax(maxind))]);
+plot(xax,ave_acc);title(['maximum accuracy ' num2str(100*maxacc) '% for alfa='  num2str(xax(maxind))]);
+
+ConfusionMatrix=ConfusionMatrices(maxind).confdata;
 
 saveName=['./EXPproper/' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');

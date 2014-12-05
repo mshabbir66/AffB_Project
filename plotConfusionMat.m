@@ -1,8 +1,6 @@
-clc
-close all
-clear all
 
-load EXPproper/CascadeRecognitionFused.mat
+
+% load EXPproper/CascadeRecognitionFused.mat
 
 imagesc(ConfusionMatrix);            %# Create a colored plot of the matrix values
 colormap(flipud(gray));  %# Change the colormap to gray (so higher values are
