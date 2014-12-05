@@ -14,7 +14,7 @@ nfold = 10;
 classifierType=2;
 
 % audio 1, video 2, feature fusion 3
-modality=3;
+modality=2;
 
 
 if(classifierType==1)
@@ -54,7 +54,7 @@ if(modality==1) %audio
     saveName2='Audio';
 elseif(modality==2) %video
     for i=1:length(AffectDataSync)
-        data(i,:)=extract_stats(AffectDataSync(i).data);
+        data(i,:)=extract_stats(AffectDataSync(i).data3d);
     end
     cRange=[-2 4 34];
     gRange=[-10 1 -5];
