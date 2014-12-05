@@ -2,10 +2,10 @@ clc
 close all
 clear all
 
-AffectDataSync = createAffectDataSync;
+% AffectDataSync = createAffectDataSync;
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
 
-%load ./Dataset/AffectDataSync+sesNumber
+load ./Dataset/AffectDataSync+sesNumber
 
 % Removing Other class
 AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
@@ -16,7 +16,7 @@ nfold = 10;
 
 
 % detection 1, recognition 2
-classifierType=2;
+classifierType=1;
 
 % audio 1, video 2, feature fusion 3
 modality=2;
