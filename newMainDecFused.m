@@ -144,15 +144,15 @@ set(ax,'YTickLabel',axlabels);
 xlabel('GT');
 ylabel('P');
 
-Precision = mean(diag(ConfusionMatrixPrecision));
-Sensitivity = mean(diag(ConfusionMatrixSensitivity));
+Precision(k) = mean(diag(ConfusionMatrixPrecision));
+Sensitivity(k) = mean(diag(ConfusionMatrixSensitivity));
 
 ave_acc(k)=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
 end
 figure;
-plot(0:0.1:1,ave_acc);
+plot(0:0.01:1,ave_acc);
 
 saveName=['./EXPproper/' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
