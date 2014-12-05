@@ -16,7 +16,7 @@ nfold = 10;
 
 
 % detection 1, recognition 2
-classifierType=1;
+classifierType=2;
 
 
 if(classifierType==1)
@@ -96,7 +96,7 @@ for i=1:nfold % nfold test
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
     acc(i).prob_values = prob_values;
-    prob=[prob;prob_values];
+    %prob=[prob;prob_values];
     figure(1);
     subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
     
@@ -106,11 +106,22 @@ for i=1:nfold % nfold test
     acc3d(i).testLabel = testLabel;
     acc3d(i).predict_label = predict_label3d;
     acc3d(i).prob_values = prob_values3d;
-    prob3d=[prob3d;prob_values3d];
+    %prob3d=[prob3d;prob_values3d];
     figure(2);
     subplot(ceil(nfold/5),5,i);imagesc(CV3d(i).grid);drawnow;
     
     disp(['done fold ', num2str(i)]);
+end
+
+prob3d=[];prob=[];
+for i=1:nfold
+    prob_values3d_ordered=zeros(size(acc3d(i).prob_values));
+    prob_values3d_ordered(:,CV3d(i).model.Label')=acc3d(i).prob_values;
+    prob3d=[prob3d;prob_values3d_ordered];
+    
+    prob_values_ordered=zeros(size(acc(i).prob_values));
+    prob_values_ordered(:,CV(i).model.Label)=acc(i).prob_values;
+    prob=[prob;prob_values_ordered];
 end
 
 acc = acc(~isnan(extractfield(acc,'accuracy')));
@@ -136,19 +147,19 @@ ConfusionMatrixSensitivity = ConfusionMatrix./(sum(ConfusionMatrix,2)*ones(1,NCl
 ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,1));
 
 %% plot and metrics
-figure;
-bar3(ConfusionMatrix');
-ax = gca;
-set(ax,'XTickLabel',axlabels);
-set(ax,'YTickLabel',axlabels);
-xlabel('GT');
-ylabel('P');
+% figure;
+% bar3(ConfusionMatrix');
+% ax = gca;
+% set(ax,'XTickLabel',axlabels);
+% set(ax,'YTickLabel',axlabels);
+% xlabel('GT');
+% ylabel('P');
 
 Precision(k) = mean(diag(ConfusionMatrixPrecision));
 Sensitivity(k) = mean(diag(ConfusionMatrixSensitivity));
 
 ave_acc(k)=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
-title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
+% title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
 end
 figure;
