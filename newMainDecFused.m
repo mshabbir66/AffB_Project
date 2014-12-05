@@ -162,8 +162,10 @@ ave_acc(k)=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 % title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
 end
+[maxval, maxind]=max(ave_acc);
 figure;
-plot(0:0.01:1,ave_acc);
+xax=0:0.01:1;
+plot(xax,ave_acc);title(['maximum accuracy ' num2str(maxval) '% for alfa='  num2str(xax(maxind))]);
 
 saveName=['./EXPproper/' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
