@@ -2,13 +2,14 @@ clc
 close all
 clear all
 
-% AffectDataSync = createAffectDataSync;
+% AffectDataSync = createAffectDataSync_plusheadpose;
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
 
-load ./Dataset/AffectDataSync+sesNumber
+load ./Dataset/newAffectDataSync
 
 % Removing Other class
 AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
+AffectDataSync(strcmp(extractfield(AffectDataSync,'fileName'),'Ses04F_impro03'))=[];
 
 nfoldCV = 3;
 nfold = 10;
@@ -137,7 +138,7 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
-saveName=['./EXPproper/' saveName1,saveName2];
-saveas(gcf, saveName, 'fig');
-save(saveName);
+% saveName=['./EXPproper/' saveName1,saveName2];
+% saveas(gcf, saveName, 'fig');
+% save(saveName);
     

@@ -21,7 +21,12 @@ load ./Dataset/soundseq.mat
 load ./Dataset/visseq.mat
 load PCA_ses1234.mat
 
-Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+%%%%%
+load newantiAffectBursts
+Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2)-length(newantiAffectBursts))';newantiAffectBursts'];
+%%%%%
+
+% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
 % Feature Extraction
 idcount=1;
@@ -35,8 +40,8 @@ for j  = 1:length(Samples)
     while winSize3d+ winShift3d*i < size(visseq(j).data{1,3},1)
         
         PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
-        PCAcoefDelta=deltas(PCAcoef',3)';
-        AffectDataSync(end+1,:).data3d = [PCAcoef PCAcoefDelta];%extract_stats(PCAcoef);
+        %PCAcoefDelta=deltas(PCAcoef',3)';
+        AffectDataSync(end+1,:).data3d = PCAcoef;%[PCAcoef PCAcoefDelta];
         
         MFCCs = ExtractMFCC(soundseq(j).data(1+winShift*i:winSize+winShift*i),fs);
         AffectDataSync(end,:).data = MFCCs;%extract_stats(MFCCs);
@@ -44,6 +49,7 @@ for j  = 1:length(Samples)
         AffectDataSync(end,:).id = idcount;
         AffectDataSync(end,:).label = Samples(j).type;
         AffectDataSync(end,:).sesNumber = str2num(Samples(j).fileName(5));
+        AffectDataSync(end,:).fileName = Samples(j).fileName;
         i  =i + 1;
         
     end
