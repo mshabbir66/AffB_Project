@@ -1,5 +1,8 @@
 function labels = GenerateAffectBurstLabelsForSingleFile(AffectBursts,fileName,numberOfFrames,labelmap)
-
+ if(isempty(AffectBursts))
+     labels = zeros(1,numberOfFrames);
+     return;
+ end
 if nargin ==3
     tempAffects = AffectBursts(strcmp(extractfield(AffectBursts,'fileName'),fileName));
     labels = zeros(1,numberOfFrames);

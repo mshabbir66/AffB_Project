@@ -1,4 +1,4 @@
-function [ AffectDataSync ] = createAffectDataSync
+% function [ AffectDataSync ] = createAffectDataSync
 %UNTÝTLED4 Summary of this function goes here
 %   Detailed explanation goes here
 fs = 16000;
@@ -21,12 +21,12 @@ load ./Dataset/soundseq.mat
 load ./Dataset/visseq.mat
 load PCA_ses1234.mat
 
-%%%%%
-load newantiAffectBursts
-Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2)-length(newantiAffectBursts))';newantiAffectBursts'];
-%%%%%
+% %%%%%
+% load newantiAffectBursts
+% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2)-length(newantiAffectBursts))';newantiAffectBursts'];
+% %%%%%
 
-% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
 % Feature Extraction
 idcount=1;
@@ -58,5 +58,4 @@ for j  = 1:length(Samples)
 end
 
 
-end
-
+% 

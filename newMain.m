@@ -2,14 +2,19 @@ clc
 close all
 clear all
 
-% AffectDataSync = createAffectDataSync_plusheadpose;
-% save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
+load AffectBurstsSession1234Cleaned
+[ antiAffectBursts ] = CreateRndAntiAffB( 285, [1 2 3 4], 'AffectBurstsSession1234Cleaned', 2000 );
+CreateAudioMat;
+CreateVisualMat;
+% AffectDataSync = createAffectDataSync;
+createAffectDataSync;
+save('./Dataset/AffectDataSyncAnotherRandom+4', 'AffectDataSync');
 
-load ./Dataset/newAffectDataSync
+% load ./Dataset/AffectDataSyncAnotherRandom+4
 
 % Removing Other class
 AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
-AffectDataSync(strcmp(extractfield(AffectDataSync,'fileName'),'Ses04F_impro03'))=[];
+%AffectDataSync(strcmp(extractfield(AffectDataSync,'fileName'),'Ses04F_impro03'))=[];
 
 nfoldCV = 3;
 nfold = 10;
@@ -61,8 +66,13 @@ elseif(modality==2) %video
     for i=1:length(AffectDataSync)
         data(i,:)=extract_stats(AffectDataSync(i).data3d);
     end
+    % base
     cRange=[-2 4 34];
     gRange=[-11 1 -7];
+    
+%     % +head
+%     cRange=[2 4 38];
+%     gRange=[-17 1 -13];
     saveName2='Video';
 else %fused
     for i=1:length(AffectDataSync)
@@ -78,7 +88,8 @@ end
 CV(nfold).model=[];
 IDs=unique(extractfield(AffectDataSync,'id'));
 len=length(IDs);
-load rand_ind.mat%rand_ind = randperm(len);
+% oad rand_ind.mat
+rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
 figure;
 for i=1:nfold % nfold test

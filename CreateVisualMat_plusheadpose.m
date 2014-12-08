@@ -21,7 +21,7 @@ for i = 1:length(Samples)
     [~]=textscan(fidv,'%d %f %s',startFrame,'Delimiter','\n','Headerlines',2);
     [~]=textscan(fidh,'%d %f %s',startFrame,'Delimiter','\n','Headerlines',2);
     visseq(i).data=textscan(fidv,'%d %f %s',endFrame-startFrame,'Delimiter','\n');
-    visseq(i).head=textscan(fidv,'%d %f %s',endFrame-startFrame,'Delimiter','\n');
+    visseq(i).head=textscan(fidh,'%d %f %s',endFrame-startFrame,'Delimiter','\n');
     fclose(fidv);
     fclose(fidh);
 %     [y,fs] = wavread(['..\Session',Samples(i).fileName(5),'\dialog\wav\',Samples(i).fileName,'.wav']);

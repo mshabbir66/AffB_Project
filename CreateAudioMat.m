@@ -1,9 +1,9 @@
-clc
-close all
-clear all
-
-load AffectBurstsSession1234Cleaned
-load antiAffectBursts
+% clc
+% close all
+% clear all
+% 
+% load AffectBurstsSession1234Cleaned
+% load antiAffectBursts
 Samples = [AffectBursts;antiAffectBursts'];
 
 soundseq(length(Samples)).data = [];
