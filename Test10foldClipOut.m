@@ -58,7 +58,7 @@ predictLabels=[]; realLabels=[];
 clipStats(len).audio=[];
 clipStats(len).visual=[];
 count=0;
-for k=1:nfold % Cross training : folding
+for k=3:nfold % Cross training : folding
     test_ind=rand_ind([floor((k-1)*len/nfold)+1:floor(k*len/nfold)]');
     testFiles=files(test_ind);
 
@@ -81,7 +81,7 @@ for k=1:nfold % Cross training : folding
 
     labelList = unique(label);
     NClass = length(labelList);
-
+    datatemp=[]; data=[];
     for i=1:length(AffectDataSync)
         datatemp(i,:)=extract_stats(AffectDataSync(i).data);
         data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
@@ -91,8 +91,8 @@ for k=1:nfold % Cross training : folding
 
     %% test
 
-    for i=1:length(testFiles)
-        fileName = testFiles(i).name(1:end-4);
+    for j=1:length(testFiles)
+        fileName = testFiles(j).name(1:end-4);
         [y,fs] = wavread(['..\Session',fileName(5),'\dialog\wav\',fileName,'.wav']);
 
         switch str2num(fileName(5))
@@ -119,12 +119,16 @@ for k=1:nfold % Cross training : folding
         unseenStats = [];
         i=0;
         count=count+1;
-        while winSize+ winShift*i < length(y)%winSize3d+ winShift3d*i < size(text{1,3},1)
+        while winSize+ winShift*i < length(y) & winSize3d+ winShift3d*i < size(text{1,3},1)
             PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
             MFCCs = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
             clipStats(count).audio(end+1,:)=extract_stats(MFCCs); 
             clipStats(count).visual(end+1,:)=extract_stats(PCAcoef);
             i = i + 1;
+        end
+        if ((winSize3d+ winShift3d*i < size(text{1,3},1))==0)
+            numberOfFrames = length(y(1:winSize+ winShift*(i-1)))*1000/fs;
+            y =y(1:winSize+ winShift*(i-1));
         end
         clipStats(count).fileName=fileName;
         % feature fusion
@@ -160,7 +164,12 @@ for k=1:nfold % Cross training : folding
 %             mask(i) = median(predict_comb(i-5:i+5,1));
 %         end
 %         predict_label_r_d=predict_label & mask;
-        predict_label_temp=[predict_label(1:5);predict_label;predict_label(end-5:end)];
+
+%         for i =6:length(twin)-5
+%             predict_label_r_d(i) = median(predict_label(i-5:i+5,1));
+%         end
+
+        predict_label_temp=[predict_label(1:5);predict_label;predict_label(end-6:end)];
         for i =1:length(twin)
             predict_label_r_d(i) = median(predict_label_temp(i:i+10,1));
         end
@@ -191,6 +200,17 @@ for k=1:nfold % Cross training : folding
     end
     disp(['done fold ', num2str(k)]);
 end
+
+for i =1:NClass
+    for j = 1:NClass
+    ConfusionMatrix(i,j) = sum(predictLabels(realLabels==i)==j);
+    end
+end
+ConfusionMatrixSensitivity = ConfusionMatrix./(sum(ConfusionMatrix,2)*ones(1,NClass));
+ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,1));
+Precision = mean(diag(ConfusionMatrixPrecision));
+Sensitivity = mean(diag(ConfusionMatrixSensitivity));
+ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 
 disp('Frame Wise calculations');
 disp(['Acc = ', num2str(sum(realLabels == (predictLabels))/length(predictLabels))]);
