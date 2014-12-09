@@ -212,6 +212,7 @@ Precision = mean(diag(ConfusionMatrixPrecision));
 Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 
+
 disp('Frame Wise calculations');
 disp(['Acc = ', num2str(sum(realLabels == (predictLabels))/length(predictLabels))]);
 disp(['FP= ', num2str(sum(realLabels==2 & (predictLabels==1)))]);
