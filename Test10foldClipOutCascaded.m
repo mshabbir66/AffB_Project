@@ -56,7 +56,7 @@ load rand_ind_forclip
 %% nfold
 predictLabels=[]; realLabels=[];
 load ./Dataset/clipStats
-
+count=0; clipResults(len).predict_label=[];
 for k=1:nfold % Cross training : folding
     test_ind=rand_ind([floor((k-1)*len/nfold)+1:floor(k*len/nfold)]');
     testFiles=files(test_ind);
@@ -103,6 +103,7 @@ for k=1:nfold % Cross training : folding
     %% test
 
     for j=1:length(testFiles)
+        count=count+1;
         fileName = testFiles(j).name(1:end-4);
         [y,fs] = wavread(['..\Session',fileName(5),'\dialog\wav\',fileName,'.wav']);
         unseenStats = clipStats(strcmp(extractfield(clipStats,'fileName'),fileName));
@@ -176,7 +177,20 @@ for k=1:nfold % Cross training : folding
 
         predictLabels=[predictLabels;predict_label];
         realLabels=[realLabels;real_label_scaled];
-
+        
+        clipResults(count).fileName=fileName;
+        clipResults(count).predict_label=predict_label;
+        clipResults(count).real_label=real_label_scaled;
+        clipResults(count).twin=twin;
+        clipResults(count).predict_labelDetect=predict_labelDetect_r_d;
+        clipResults(count).audio=unseenStats.audio;
+        clipResults(count).visual=unseenStats.visual;
+       %% clip grab and save
+       if(strcmp(fileName,'Ses01F_script02_2') | strcmp(fileName,'Ses04F_impro03'))
+           saveas(gcf, ['./EXPproper/ClipOutTest_' fileName], 'fig');
+           save(['./EXPproper/ClipOutTest_' fileName],'predict_label','real_label_scaled','twin','fileName');
+       end
+           
     end
     disp(['done fold ', num2str(k)]);
 end
