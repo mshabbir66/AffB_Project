@@ -17,7 +17,7 @@ textStrings(idx) = {'   '};
 %% ################
 
 [x,y] = meshgrid(1:3);   %# Create x and y coordinates for the strings
-hStrings = text(x(:),y(:),textStrings{:},...      %# Plot the strings
+hStrings = text(x(:),y(:),textStrings(:),...      %# Plot the strings
                 'HorizontalAlignment','center');
 set(gca,'Clim',[10,700]);
 midValue = mean(get(gca,'CLim'));  %# Get the middle value of the color range
@@ -33,5 +33,5 @@ set(gca,'XTick',1:3,...                         %# Change the axes tick marks
         'YTickLabel',{'L','B','R','D','E'},...
         'TickLength',[0 0]);
 
-xlabel('Predicted')
-ylabel('Ground Truth')
+%xlabel('Predicted')
+%ylabel('Ground Truth')
