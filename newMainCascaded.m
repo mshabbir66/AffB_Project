@@ -186,3 +186,6 @@ title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2st
 saveName=['./EXPproper/Cascade' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
+
+
+
