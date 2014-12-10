@@ -39,7 +39,7 @@ else
     saveName1='Recognition';
 end
 
-cRange=[-2 4 46];
+cRange=[2 4 50];
 gRange=[-13 1 -10];
 saveName2='Fused';
 
@@ -55,10 +55,9 @@ len=length(files);
 load rand_ind_forclip
 %% nfold
 predictLabels=[]; realLabels=[];
-clipStats(len).audio=[];
-clipStats(len).visual=[];
-count=0;
-for k=1:2 % Cross training : folding
+load ./Dataset/clipStats
+
+for k=1:nfold % Cross training : folding
     test_ind=rand_ind([floor((k-1)*len/nfold)+1:floor(k*len/nfold)]');
     testFiles=files(test_ind);
 
@@ -87,54 +86,34 @@ for k=1:2 % Cross training : folding
         data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
     end
 
-    [model, bestParam, grid ]= learn_on_trainingData(data, label, cRange, gRange, nfoldCV, 0);
+    trainLabelDetect=label;
+    trainLabelDetect(trainLabelDetect == LAUGHTER) = 1;
+    trainLabelDetect(trainLabelDetect == BREATHING) = 1;
+    trainLabelDetect(trainLabelDetect == REJECT) = 2;
+    trainDataDetect=data;
+    
+    trainLabelRec = label;
+    trainDataRec=data;
+    trainDataRec(trainLabelRec == REJECT,:) = [];
+    trainLabelRec(trainLabelRec == REJECT) = [];
+  
+    [modelDetect, bestParamDetect, gridDetect ]= learn_on_trainingData(trainDataDetect, trainLabelDetect, cRange, gRange, nfoldCV, 0);
+    [modelRec, bestParamRec, gridRec ]= learn_on_trainingData(trainDataRec, trainLabelRec, cRange, [-15 1 -12], nfoldCV, 0);
 
     %% test
 
     for j=1:length(testFiles)
         fileName = testFiles(j).name(1:end-4);
         [y,fs] = wavread(['..\Session',fileName(5),'\dialog\wav\',fileName,'.wav']);
-
-        switch str2num(fileName(5))
-            case 1
-                y = y(:,1);
-            case 2
-                y = y(:,2);
-            case 3
-                y = y(:,2);
-            case 4
-                y = y(:,2);
-        end
-
-        fidv = fopen(['../Session',fileName(5),'/dialog/MOCAP_rotated/',fileName ,'.txt'],'r');
-        text=textscan(fidv,'%d %f %s','Delimiter','\n','Headerlines',2);
-        fclose(fidv);
-
-        datamat=zeros(165,size(text{1,3},1));
-        for i=1:size(text{1,3},1)
-            datamat(:,i)=str2double(strsplit(text{1,3}{i}))';
-        end
-
-        numberOfFrames=length(y)*1000/fs;
-        unseenStats = [];
-        i=0;
-        count=count+1;
-        while winSize+ winShift*i < length(y) & winSize3d+ winShift3d*i < size(text{1,3},1)
-            PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
-            MFCCs = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
-            clipStats(count).audio(end+1,:)=extract_stats(MFCCs); 
-            clipStats(count).visual(end+1,:)=extract_stats(PCAcoef);
-            i = i + 1;
-        end
-        if ((winSize3d+ winShift3d*i < size(text{1,3},1))==0)
-            numberOfFrames = length(y(1:winSize+ winShift*(i-1)))*1000/fs;
-            y =y(1:winSize+ winShift*(i-1));
-        end
-        clipStats(count).fileName=fileName;
+        unseenStats = clipStats(strcmp(extractfield(clipStats,'fileName'),fileName));
+        winCount=size(unseenStats.audio,1);
+        numberOfFrames = length(y(1:winSize+ winShift*(winCount-1)))*1000/fs;
+  
         % feature fusion
-        unseenStats=[clipStats(count).audio clipStats(count).visual];
+        unseenStatsDetect=[unseenStats.audio unseenStats.visual];
         
-        [predict_label, ~ ,prob_values] = svmpredict(zeros(size(unseenStats,1),1), unseenStats, model);
+        [predict_labelDetect, ~ ,prob_valuesDetect] = svmpredict(zeros(size(unseenStatsDetect,1),1), unseenStatsDetect, modelDetect);
+
 
         %% ground truth compare
         labelmap = containers.Map;
@@ -143,14 +122,14 @@ for k=1:2 % Cross training : folding
         labelmap('Other') = OTHER;
         labelmap('REJECT') = REJECT;
 
-        AffAnno=Aff.AffectBursts(strcmp(extractfield(Aff.AffectBursts,'fileName'),fileName));
+        %AffAnno=Aff.AffectBursts(strcmp(extractfield(Aff.AffectBursts,'fileName'),fileName));
 
-        real_label = GenerateAffectBurstLabelsForSingleFile(AffAnno,fileName,numberOfFrames,labelmap);
+        real_label = GenerateAffectBurstLabelsForSingleFile(Aff.AffectBursts,fileName,numberOfFrames,labelmap);
         
         t=0:1/1000:length(real_label)/1000-1/1000;
         twin=0:shiftms/1000:length(real_label)/1000-shiftms/1000;
-        real_label_scaled = zeros(size(predict_label));
-        predict_label_r_d = zeros(size(predict_label));
+        real_label_scaled = zeros(size(predict_labelDetect));
+        predict_labelDetect_r_d = zeros(size(predict_labelDetect));
 
         twin=twin(2:end-1);
         for i =2:length(twin)
@@ -158,28 +137,29 @@ for k=1:2 % Cross training : folding
         end
         real_label_scaled(real_label_scaled==0) = REJECT;
         
-%         predict_comb=(predict_label~=REJECT);
-%         mask=zeros(size(predict_label));
-%         for i =6:length(twin)-5
-%             mask(i) = median(predict_comb(i-5:i+5,1));
-%         end
-%         predict_label_r_d=predict_label & mask;
 
-%         for i =6:length(twin)-5
-%             predict_label_r_d(i) = median(predict_label(i-5:i+5,1));
-%         end
-
-        predict_label_temp=[predict_label(1:5);predict_label;predict_label(end-6:end)];
+        predict_label_temp=[predict_labelDetect(1:5);predict_labelDetect;predict_labelDetect(end-4:end)];
         for i =1:length(twin)
-            predict_label_r_d(i) = median(predict_label_temp(i:i+10,1));
+            predict_labelDetect_r_d(i) = median(predict_label_temp(i:i+10,1));
         end
+        
+        
+        unseenStatsRec = unseenStatsDetect;
+        unseenStatsRec = unseenStatsRec(predict_labelDetect_r_d==1,:);
+        
+        [predict_labelRec, ~ ,prob_valuesRec] = svmpredict(zeros(size(unseenStatsRec,1),1), unseenStatsRec, modelRec);
 
+        predict_label=predict_labelDetect_r_d;
+        predict_label(predict_labelDetect_r_d==2)=REJECT;
+        predict_label(predict_labelDetect_r_d==1)=predict_labelRec;
+        
+        
         %% Plots
-        figure(count);
+        figure(1);
         subplot(2,1,1);
-        bar(twin,predict_label_r_d==LAUGHTER,'b','EdgeColor','None');
+        bar(twin,predict_label==LAUGHTER,'b','EdgeColor','None');
         hold on;
-        bar(twin,predict_label_r_d==BREATHING,'r','EdgeColor','None');
+        bar(twin,predict_label==BREATHING,'r','EdgeColor','None');
 
         title('Predicted');
         %line([step,step],[0,1],'LineWidth',2,'Color','g');
@@ -194,7 +174,7 @@ for k=1:2 % Cross training : folding
         hold off;
         drawnow;
 
-        predictLabels=[predictLabels;predict_label_r_d];
+        predictLabels=[predictLabels;predict_label];
         realLabels=[realLabels;real_label_scaled];
 
     end
