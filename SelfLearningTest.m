@@ -3,7 +3,7 @@ clear all
 close all
 
 fs = 16000;
-Vfs=120;
+% Vfs=120;
 
 winms=750; %in ms
 shiftms=250; %frame periodicity in ms
@@ -11,8 +11,8 @@ shiftms=250; %frame periodicity in ms
 winSize  = winms/1000*fs;
 winShift = shiftms/1000*fs;
 
-winSize3d  = winms/1000*Vfs;
-winShift3d = shiftms/1000*Vfs;
+% winSize3d  = winms/1000*Vfs;
+% winShift3d = shiftms/1000*Vfs;
 
 nfoldCV = 3;
 nfold = 10;
@@ -55,7 +55,7 @@ for k=1:nfold % Cross training : folding
         trainData=[trainData;fusedData(clipStatsResults(train_ind(i)).new_real_label~=3,:)];
         % reject samples
         rejectData=fusedData(clipStatsResults(train_ind(i)).new_real_label==3,:);
-        randrej=randi(size(rejectData,1),1,round(length(affLabels)/10))';
+        randrej=randi(size(rejectData,1),1,round(length(affLabels)/2))';
         trainLabel=[trainLabel;REJECT*ones(size(randrej))];
         trainData=[trainData;rejectData(randrej,:)];
     end
@@ -71,8 +71,8 @@ for k=1:nfold % Cross training : folding
     trainDataRec(trainLabelRec == REJECT,:) = [];
     trainLabelRec(trainLabelRec == REJECT) = [];
   
-    [modelDetect, bestParamDetect, gridDetect ]= learn_on_trainingData(trainDataDetect, trainLabelDetect, [-6 8 58], [-17 2 -7], nfoldCV, 0);
-    [modelRec, bestParamRec, gridRec ]= learn_on_trainingData(trainDataRec, trainLabelRec, cRange, [-15 1 -12], nfoldCV, 0);
+    %[modelDetect, bestParamDetect, gridDetect ]= learn_on_trainingData(trainDataDetect, trainLabelDetect, [-6 8 58], [-17 2 -7], nfoldCV, 0);
+    [modelRec, bestParamRec, gridRec ]= learn_on_trainingData(trainDataRec, trainLabelRec,[-6 8 66 ], [-21 2 -9], nfoldCV, 0);
 
     %% test
     testData=[]; testLabel=[];
