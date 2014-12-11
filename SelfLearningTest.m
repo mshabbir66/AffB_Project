@@ -23,7 +23,7 @@ OTHER = 3;
 REJECT = 3;
 NClass = 3;
 
-cRange=[2 4 50];
+cRange=[2 4 42];
 gRange=[-13 1 -10];
 
 load ./Dataset/clipStatsResults
@@ -71,9 +71,10 @@ for k=1:nfold % Cross training : folding
     trainDataRec(trainLabelRec == REJECT,:) = [];
     trainLabelRec(trainLabelRec == REJECT) = [];
   
-    %[modelDetect, bestParamDetect, gridDetect ]= learn_on_trainingData(trainDataDetect, trainLabelDetect, [-6 8 58], [-17 2 -7], nfoldCV, 0);
-    [modelRec, bestParamRec, gridRec ]= learn_on_trainingData(trainDataRec, trainLabelRec,[-6 8 66 ], [-21 2 -9], nfoldCV, 0);
-
+%     [modelDetect, bestParamDetect, gridDetect ]= learn_on_trainingData(trainDataDetect, trainLabelDetect, [-6 8 58], [-17 2 -7], nfoldCV, 0);
+%     [modelRec, bestParamRec, gridRec ]= learn_on_trainingData(trainDataRec, trainLabelRec,[-6 8 58], [-21 2 -9], nfoldCV, 0);
+    [modelDetect, bestParamDetect, gridDetect ]= learn_on_trainingData(trainDataDetect, trainLabelDetect, cRange, gRange, nfoldCV, 0);
+    [modelRec, bestParamRec, gridRec ]= learn_on_trainingData(trainDataRec, trainLabelRec, cRange, gRange, nfoldCV, 0);
     %% test
     testData=[]; testLabel=[];
     for i=1:length(test_ind)
