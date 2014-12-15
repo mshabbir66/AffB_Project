@@ -51,8 +51,8 @@ for i=1:4
 end
 len=length(files);
 % rand_ind = randperm(len);
-% save('rand_ind_forclip', 'rand_ind');
-load rand_ind_forclip
+% save('rand_ind_forclip_ses3half', 'rand_ind');
+% load rand_ind_forclip
 %% nfold
 predictLabels=[]; realLabels=[];
 load ./Dataset/clipStats
@@ -65,7 +65,7 @@ for k=1:nfold % Cross training : folding
     load ./Dataset/AffectDataSync
     % Removing Other class
     AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
-      for i=length(testFiles)
+      for i=1:length(testFiles)
           AffectDataSync(strcmp(extractfield(AffectDataSync,'fileName'),testFiles(i).name(1:end-4)))=[];
       end
 
@@ -138,12 +138,15 @@ for k=1:nfold % Cross training : folding
         end
         real_label_scaled(real_label_scaled==0) = REJECT;
         
-
-        predict_label_temp=[predict_labelDetect(1:5);predict_labelDetect;predict_labelDetect(end-4:end)];
+        medianHalf=3;
+        predict_label_temp=[predict_labelDetect(1:medianHalf);predict_labelDetect;predict_labelDetect(end-medianHalf+1:end)];
         for i =1:length(twin)
-            predict_labelDetect_r_d(i) = median(predict_label_temp(i:i+10,1));
+            predict_labelDetect_r_d(i) = median(predict_label_temp(i:i+2*medianHalf,1));
         end
         
+        numDilate=2;
+        [ predict_labelDetect_r_d ] = Signal_dilate( predict_labelDetect_r_d', numDilate );
+        predict_labelDetect_r_d =predict_labelDetect_r_d';
         
         unseenStatsRec = unseenStatsDetect;
         unseenStatsRec = unseenStatsRec(predict_labelDetect_r_d==1,:);
@@ -227,3 +230,5 @@ recall=100*TP/(TP+FN);
 %saveas(gcf, './EXP/DetectionFused_Unseen', 'fig');
 %save ./EXP/DetectionFused_Unseen
 
+save(['./EXPproper/10foldClipOutTestHier_med' num2str(2*medianHalf+1) '_dil' num2str(numDilate)]...
+     ,'ConfusionMatrix','ConfusionMatrixPrecision','ConfusionMatrixSensitivity','medianHalf','numDilate');

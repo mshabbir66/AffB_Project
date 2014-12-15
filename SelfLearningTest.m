@@ -53,13 +53,29 @@ for k=1:nfold % Cross training : folding
         affLabels=clipStatsResults(train_ind(i)).new_real_label(clipStatsResults(train_ind(i)).new_real_label~=3);
         trainLabel=[trainLabel;affLabels];
         trainData=[trainData;fusedData(clipStatsResults(train_ind(i)).new_real_label~=3,:)];
-        % reject samples
-        rejectData=fusedData(clipStatsResults(train_ind(i)).new_real_label==3,:);
-        randrej=randi(size(rejectData,1),1,round(length(affLabels)/2))';
-        trainLabel=[trainLabel;REJECT*ones(size(randrej))];
-        trainData=[trainData;rejectData(randrej,:)];
+%         % reject samples
+%         rejectData=fusedData(clipStatsResults(train_ind(i)).new_real_label==3,:);
+%         randrej=randi(size(rejectData,1),1,round(length(affLabels)/2))';
+%         trainLabel=[trainLabel;REJECT*ones(size(randrej))];
+%         trainData=[trainData;rejectData(randrej,:)];
     end
-
+    
+    load ./Dataset/RejectDataSync
+    % Removing Other class
+%     AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
+%     AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Breathing'))=[];
+%     AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Laughter'))=[];
+      for i=1:length(test_ind)
+          RejectDataSync(strcmp(extractfield(RejectDataSync,'fileName'), clipStatsResults(test_ind(i)).fileName ))=[];
+      end
+      datatemp=[]; rejectData=[];
+    for i=1:length(RejectDataSync)
+        datatemp(i,:)=extract_stats(RejectDataSync(i).data);
+        rejectData(i,:)=[datatemp(i,:) extract_stats(RejectDataSync(i).data3d)];
+    end
+    trainLabel=[trainLabel;REJECT*ones(size(rejectData,1),1)];
+    trainData=[trainData;rejectData];
+    
     trainLabelDetect=trainLabel;
     trainLabelDetect(trainLabelDetect == LAUGHTER) = 1;
     trainLabelDetect(trainLabelDetect == BREATHING) = 1;

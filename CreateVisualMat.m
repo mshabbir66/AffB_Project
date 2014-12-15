@@ -4,7 +4,7 @@
 % 
 % load AffectBurstsSession1234Cleaned
 % load antiAffectBursts
-Samples = [AffectBursts;antiAffectBursts'];
+Samples = antiAffectBursts'; %[AffectBursts;antiAffectBursts'];
 Vfs=120;
 
 visseq(length(Samples)).data = [];
@@ -39,4 +39,4 @@ for i = 1:length(Samples)
     
 end
 
-save Dataset/visseq.mat visseq
+%save Dataset/visseq.mat visseq

@@ -3,12 +3,13 @@ close all
 clear all
 
 load AffectBurstsSession1234Cleaned
-[ antiAffectBursts ] = CreateRndAntiAffB( 285, [1 2 3 4], 'AffectBurstsSession1234Cleaned', 2000 );
+[ antiAffectBursts ] = CreateRndAntiAffB( 880, [1 2 3 4], 'AffectBurstsSession1234Cleaned', 2000 );
 CreateAudioMat;
 CreateVisualMat;
 % AffectDataSync = createAffectDataSync;
 createAffectDataSync;
-save('./Dataset/AffectDataSyncAnotherRandom+4', 'AffectDataSync');
+RejectDataSync=AffectDataSync;
+save('./Dataset/RejectDataSync', 'RejectDataSync');
 
 % load ./Dataset/AffectDataSyncAnotherRandom+4
 

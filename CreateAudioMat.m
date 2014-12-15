@@ -4,7 +4,7 @@
 % 
 % load AffectBurstsSession1234Cleaned
 % load antiAffectBursts
-Samples = [AffectBursts;antiAffectBursts'];
+Samples = antiAffectBursts'; %[AffectBursts;antiAffectBursts'];
 
 soundseq(length(Samples)).data = [];
 
@@ -30,4 +30,4 @@ for i = 1:length(Samples)
     
 end
 
-save Dataset/soundseq.mat soundseq
+%save Dataset/soundseq.mat soundseq
