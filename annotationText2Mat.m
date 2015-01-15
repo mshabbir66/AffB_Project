@@ -8,8 +8,8 @@
 clear all
 
 %% Initialize variables.
-path = '../Session4/Session4Annotation/';
-%file = 'Ses04F_impro03_candogan2.txt';
+path = '../../Taboo/';
+file = 'Shabbir-Laughter.txt';
 delimiter = '\t';
 
 %% Format string for each line of text:
@@ -50,12 +50,12 @@ suffix = dataArray{:, 5};
 %% Clear temporary variables
 clearvars filename delimiter formatSpec fileID dataArray ans;
 
-Ses04.endTime=zeros(length(type));
+TabooSes02.endTime=zeros(length(type));
 for i=1:length(type)
-    Ses04(i).type=type{i};
-    Ses04(i).startTime=sT(i);
-    Ses04(i).endTime=eT(i);
-    Ses04(i).fileName=file(1:end-4);
+    TabooSes02(i).type=type{i};
+    TabooSes02(i).startTime=sT(i);
+    TabooSes02(i).endTime=eT(i);
+    TabooSes02(i).fileName=file(1:end-4);
 end
 
-save([path file(1:end-4)],'Ses04');
+save([path file(1:end-4)],'TabooSes02');
