@@ -16,6 +16,8 @@ LAUGHTER = 1;
 BREATHING = 2;
 REJECT = 3;
 
+axlabels={'Laughter','Breathing','Reject'};
+
 %% label and feature extraction
 LABEL=extractfield(AffectDataSync,'label')';
 label = zeros(length(LABEL),1);
@@ -25,7 +27,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-NComponents=4;
+NComponents=3;
 
 %% nfold test
 CV(nfold).model=[];
@@ -60,24 +62,18 @@ for i=1:nfold % nfold test
 %     acc(i).testLabel = testLabel;
 %     acc(i).predict_label = predict_label; 
 %     subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
-for j=1:length(testData) 
-        vectorClasses = zeros(1,NClass);
-        for class=1:NClass
-            [~,Pos] = posterior(model(class).obj,testData(j).data);           
-             suma=0;
-             for k=1:NComponents
-                 suma = suma + Pos(1,k)*model(class).obj.PComponents(k);
-             end
-            vectorClasses(class)=suma;
-        end
-end    
-    [v ix] = sort(vectorClasses,'descend');
-    if ix(1)==realClass
-        success= 1;
-    else
-        success= 0;
-    end
 
+Pos=zeros(length(testData),NClass);
+for j=1:length(testData) 
+    for class=1:NClass
+        [~,Pos(j,class)] = posterior(model(class).obj,testData(j).data);           
+    end
+end    
+    [v ix] = sort(Pos,2);
+    predict_label=ix(:,1);
+    %acc=sum(ix(:,1)==testLabel)/length(testLabel);
+    acc(i).testLabel = testLabel;
+    acc(i).predict_label = predict_label; 
     disp(['done fold ', num2str(i)]);
 end
 
@@ -108,7 +104,7 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
-saveName=['./EXPproper/' saveName1,saveName2];
-saveas(gcf, saveName, 'fig');
-save(saveName);
+% saveName=['./EXPproper/' saveName1,saveName2];
+% saveas(gcf, saveName, 'fig');
+% save(saveName);
     
