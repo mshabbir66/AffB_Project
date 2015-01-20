@@ -7,10 +7,10 @@ function [ model, bestCom, cv ] = CVtrainGMM(trainData, trainLabel, comRange, nf
 NClass=length(unique(trainLabel));
 bestcv = 0;
 i =1;
-for com = comRange(1):comRange(2):comRange(3),
+for N = comRange(1):comRange(2):comRange(3),
     %         cv(i) = get_cv_ac_bin(trainLabel, trainData, cmd, nfoldCV);
     
-    
+    com=2^N;
     len=length(trainLabel);
     ac = 0;
     rand_ind = randperm(len);
