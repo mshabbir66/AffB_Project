@@ -10,6 +10,7 @@ load ./Dataset/AffectDataSync+sesNumber
 % Removing Other class
 AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 
+nfoldCV=3;
 nfold = 10;
 
 LAUGHTER = 1;
@@ -27,7 +28,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-NComponents=3;
+comRange=[1,1,10];
 
 %% nfold test
 CV(nfold).model=[];
@@ -54,19 +55,12 @@ for i=1:nfold % nfold test
   testData=AffectDataSync(test_ind,:);
   testLabel=label(test_ind);
   
-  [ model ] = trainGMM( trainData, trainLabel, NComponents );
-  
-%   [CV(i).model, CV(i).bestParam, CV(i).grid ]= learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV, 0);
-%   [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, CV(i).model);
-%     acc(i).accuracy=accuracy(1);
-%     acc(i).testLabel = testLabel;
-%     acc(i).predict_label = predict_label; 
-%     subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
+  [ model, bestCom, cv ] = CVtrainGMM(trainData, trainLabel, comRange, nfoldCV);
 
 Pos=zeros(length(testData),NClass);
 for j=1:length(testData) 
     for class=1:NClass
-        [~,Pos(j,class)] = posterior(model(class).obj,testData(j).data);           
+        [~,Pos(j,class)] = posterior(model(class).obj,testData(j).data3d);           
     end
 end    
     [v ix] = sort(Pos,2);
