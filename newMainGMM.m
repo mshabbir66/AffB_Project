@@ -28,7 +28,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-comRange=[1,1,10];
+comRange=[1,1,7];
 
 %% nfold test
 CV(nfold).model=[];
