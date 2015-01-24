@@ -11,40 +11,29 @@ for N = comRange(1):comRange(2):comRange(3),
     %         cv(i) = get_cv_ac_bin(trainLabel, trainData, cmd, nfoldCV);
     
     com=2^N;
+    len=length(trainLabel);
     ac = 0;
-    IDs=unique(extractfield(trainData,'id'));
-    len=length(IDs);
     rand_ind = randperm(len);
-    rand_id = IDs(rand_ind);
     for j=1:nfoldCV % Cross training : folding
-        train_ind=[];test_ind=[];
-        test_id=rand_id([floor((j-1)*len/nfoldCV)+1:floor(j*len/nfoldCV)]');
-        train_id = rand_id;
-        train_id([floor((j-1)*len/nfoldCV)+1:floor(j*len/nfoldCV)]) = [];
-        
-        for k=1:length(train_id)
-            train_ind=[train_ind;find(extractfield(trainData,'id')==train_id(k))'];
-        end
-        
-        for k=1:length(test_id)
-            test_ind=[test_ind;find(extractfield(trainData,'id')==test_id(k))'];
-        end
+        test_ind=rand_ind([floor((j-1)*len/nfoldCV)+1:floor(j*len/nfoldCV)]');
+        train_ind = [1:len]';
+        train_ind(test_ind) = [];
         
         [ model ] = trainGMM(trainData(train_ind), trainLabel(train_ind), com );
         
         testData=trainData(test_ind);
         testLabel=trainLabel(test_ind);
         Pos=zeros(length(testData),NClass);
-        for k=1:length(testData)
+        for j=1:length(testData)
             for class=1:NClass
-                [~,Pos(k,class)] = posterior(model(class).obj,testData(k).data3d);
+                [~,Pos(j,class)] = posterior(model(class).obj,testData(j).data3d);
             end
         end
         [v ix] = sort(Pos,2);
         pred=ix(:,1);
         ac = ac + sum(ix(:,1)==testLabel);
     end
-    ac = ac / length(trainLabel);
+    ac = ac / len;
     fprintf('Cross-validation Accuracy = %g%%\n', ac * 100);
     cv(i)=ac;
     
