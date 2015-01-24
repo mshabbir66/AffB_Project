@@ -1,8 +1,8 @@
 function model = trainHMMGMM(trainData, trainLabel)
 
 d = 26;
-nstates = 2;
-nmix    = 64; % must specify nmix
+nstates = 6;
+nmix    = 6; % must specify nmix
 
 
 trainDataCell = struct2cell(trainData);
@@ -17,5 +17,5 @@ end
 
 for i = 1:length(unique(trainLabel))
     model(i) = hmmFit(trainDataCell(trainLabel==i), nstates, 'mixGaussTied', 'verbose', true, ...
-        'nRandomRestarts', 1, 'maxiter', 10, 'nmix', nmix); 
+        'nRandomRestarts', 2, 'maxiter', 100, 'nmix', nmix); 
 end
