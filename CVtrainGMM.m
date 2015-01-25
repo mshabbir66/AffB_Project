@@ -38,7 +38,7 @@ for N = comRange(1):comRange(2):comRange(3),
         Pos=zeros(length(testLabel),NClass);
         for k=1:length(testLabel)
             for class=1:NClass
-                [~,Pos(j,class)] = posterior(model(class).obj,testData(k).data);
+                [~,Pos(k,class)] = posterior(model(class).obj,testData(k).data);
             end
         end
         [v ix] = sort(Pos,2);
