@@ -4,6 +4,7 @@ function [ model, bestCom, cv ] = CVtrainGMM(trainData, trainLabel, comRange, nf
 % % #######################
 % % Parameter selection using 3-fold cross validation
 % % #######################
+cv(nfoldCV).acc=[];
 NClass=length(unique(trainLabel));
 bestcv = 0;
 i =1;
@@ -35,14 +36,14 @@ for N = comRange(1):comRange(2):comRange(3),
     end
     ac = ac / len;
     fprintf('Cross-validation Accuracy = %g%%\n', ac * 100);
-    cv(i)=ac;
+    cv(i).acc=ac;
+    cv(i).com=com;
     
     
-    
-    if (cv(i) >= bestcv),
-        bestcv = cv(i); bestCom = com;
+    if (ac >= bestcv),
+        bestcv = ac; bestCom = com;
     end
-    fprintf('%g %g (best com=%g, rate=%g)\n', com, cv(i), bestCom, bestcv);
+    fprintf('%g %g (best com=%g, rate=%g)\n', com, ac, bestCom, bestcv);
     i = i + 1;
 end
     

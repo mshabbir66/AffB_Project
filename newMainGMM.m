@@ -5,7 +5,7 @@ clear all
 % AffectDataSync = createAffectDataSync;
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
 
-load ./Dataset/AffectDataSync+sesNumber
+load ./Dataset/AffectDataSyncNew
 
 % Removing Other class
 AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
@@ -45,15 +45,19 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-comRange=[1,1,6];
+comRange=[1,1,3];
 
 if(modality==1) %audio
     saveName2='Audio';
 elseif(modality==2) %video
-    AffectDataSync.data=AffectDataSync.data3d;
+    for i=1:length(AffectDataSync)
+        AffectDataSync(i).data=AffectDataSync(i).data3d;
+    end
     saveName2='Video';
 else %fused
-    AffectDataSync.data=[AffectDataSync.data AffectDataSync.data3d];
+    for i=1:length(AffectDataSync)
+        AffectDataSync(i).data=[AffectDataSync(i).data AffectDataSync(i).data3d];
+    end
     saveName2='Fused';
 end
 
