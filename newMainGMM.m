@@ -129,7 +129,7 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
-% saveName=['./EXPproper/' saveName1,saveName2];
-% saveas(gcf, saveName, 'fig');
-% save(saveName);
+saveName=['./EXPproper/GMM' saveName1,saveName2];
+saveas(gcf, saveName, 'fig');
+save(saveName);
     
