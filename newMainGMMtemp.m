@@ -19,7 +19,7 @@ nfold = 10;
 classifierType=2;
 
 % audio 1, video 2, feature fusion 3
-modality=2;
+modality=1;
 
 
 if(classifierType==1)
@@ -99,17 +99,17 @@ for j=1:length(testData)
     end
 end    
     [v ix] = sort(Pos,2);
-    predict_label=ix(:,1);
     %acc=sum(ix(:,1)==testLabel)/length(testLabel);
-    acc(i).testLabel = testLabel;
-    acc(i).predict_label = predict_label; 
+    folds(i).testLabel = testLabel;
+    folds(i).predict_label = ix(:,1);
+    folds(i).prob_values = Pos;
     disp(['done fold ', num2str(i)]);
 end
 
 
 %% confusion matrix
-predictLabels = extractfield(acc, 'predict_label');
-testLabels = extractfield(acc, 'testLabel');
+predictLabels = extractfield(folds, 'predict_label');
+testLabels = extractfield(folds, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
     ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);

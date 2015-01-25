@@ -1,7 +1,8 @@
 function [ model ] = trainGMM( trainData, trainLabel, NComponents )
 %UNTÝTLED2 Summary of this function goes here
 %   Detailed explanation goes here
-options = statset('MaxIter',1000);
+
+%options = statset('MaxIter',1000);
 Nclass=length(unique(trainLabel));
 model(Nclass).obj=[];
     for class=1:Nclass
@@ -12,7 +13,7 @@ model(Nclass).obj=[];
             end
         end
 
-        model(class).obj = gmdistribution.fit(data,NComponents,'Regularize',.1,'Options',options);
+        model(class).obj = gmdistribution.fit(data,NComponents,'Regularize',.1);%,'Options',options);
     end
 
 end

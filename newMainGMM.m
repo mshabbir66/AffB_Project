@@ -100,10 +100,10 @@ for j=1:length(testData)
     end
 end    
     [v ix] = sort(Pos,2);
-    predict_label=ix(:,1);
     %acc=sum(ix(:,1)==testLabel)/length(testLabel);
-    acc(i).testLabel = testLabel;
-    acc(i).predict_label = predict_label; 
+    folds(i).testLabel = testLabel;
+    folds(i).predict_label = ix(:,1);
+    folds(i).prob_values = Pos;
     disp(['done fold ', num2str(i)]);
 end
 
