@@ -26,7 +26,7 @@ for N = comRange(1):comRange(2):comRange(3),
         Pos=zeros(length(testData),NClass);
         for j=1:length(testData)
             for class=1:NClass
-                [~,Pos(j,class)] = posterior(model(class).obj,testData(j).data3d);
+                [~,Pos(j,class)] = posterior(model(class).obj,testData(j).data);
             end
         end
         [v ix] = sort(Pos,2);

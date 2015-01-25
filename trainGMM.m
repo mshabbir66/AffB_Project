@@ -8,7 +8,7 @@ model(Nclass).obj=[];
         data=[];
         for i=1:length(trainData)
             if(trainLabel(i)==class)
-                data=[data;trainData(i).data3d];
+                data=[data;trainData(i).data];
             end
         end
 

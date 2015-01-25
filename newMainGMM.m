@@ -13,11 +13,28 @@ AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 nfoldCV=3;
 nfold = 10;
 
-LAUGHTER = 1;
-BREATHING = 2;
-REJECT = 3;
+% detection 1, recognition 2
+classifierType=2;
 
-axlabels={'Laughter','Breathing','Reject'};
+% audio 1, video 2, feature fusion 3
+modality=3;
+
+
+if(classifierType==1)
+    LAUGHTER = 1;
+    BREATHING = 1;
+    %OTHER = 1;
+    REJECT = 2;
+    axlabels={'Affect Burst','Reject'};
+    saveName1='Detection';
+else
+    LAUGHTER = 1;
+    BREATHING = 2;
+    %OTHER = 1;
+    REJECT = 3;
+    axlabels={'Laughter','Breathing','Reject'};
+    saveName1='Recognition';
+end
 
 %% label and feature extraction
 LABEL=extractfield(AffectDataSync,'label')';
@@ -28,7 +45,18 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-comRange=[1,1,7];
+comRange=[1,1,6];
+
+if(modality==1) %audio
+    saveName2='Audio';
+elseif(modality==2) %video
+    AffectDataSync.data=AffectDataSync.data3d;
+    saveName2='Video';
+else %fused
+    AffectDataSync.data=[AffectDataSync.data AffectDataSync.data3d];
+    saveName2='Fused';
+end
+
 
 %% nfold test
 CV(nfold).model=[];
@@ -36,7 +64,6 @@ IDs=unique(extractfield(AffectDataSync,'id'));
 len=length(IDs);
 load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
-figure;
 parfor i=1:nfold % nfold test
   train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
