@@ -45,7 +45,7 @@ for N = comRange(1):comRange(2):comRange(3),
         pred=ix(:,1);
         ac = ac + sum(ix(:,1)==testLabel);
     end
-    ac = ac / length(testLabel);
+    ac = ac / length(trainLabel);
     fprintf('Cross-validation Accuracy = %g%%\n', ac * 100);
     cv(i).acc=ac;
     cv(i).com=com;

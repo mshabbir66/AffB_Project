@@ -1,6 +1,8 @@
+clear all;
+for p=1:2
 clc
 close all
-clear all
+clearvars -except p
 
 % AffectDataSync = createAffectDataSync;
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
@@ -13,8 +15,9 @@ AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 nfoldCV=3;
 nfold = 10;
 
+
 % detection 1, recognition 2
-classifierType=1;
+classifierType=p;
 
 % audio 1, video 2, feature fusion 3
 modality=3;
@@ -132,4 +135,4 @@ title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2st
 saveName=['./EXPproper/GMM' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
-    
+end
