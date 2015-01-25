@@ -48,7 +48,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-comRange=[1,1,4];
+comRange=[1,1,3];
 
 if(modality==1) %audio
     saveName2='Audio';

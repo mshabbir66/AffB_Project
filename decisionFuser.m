@@ -1,6 +1,6 @@
 function [ fused ] = decisionFuser( modality1, modality2, alfa1)
-    modality1=log(modality1);
-    modality2=log(modality2);
+    %modality1=log(modality1);
+    %modality2=log(modality2);
     
     mean1=mean(modality1(:));
     mean2=mean(modality2(:));

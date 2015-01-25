@@ -1,6 +1,8 @@
+clear all;
+for p=1:2
 clc
 close all
-clear all
+clearvars -except p
 
 % AffectDataSync = createAffectDataSync;
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
@@ -16,7 +18,7 @@ nfold = 10;
 
 
 % detection 1, recognition 2
-classifierType=2;
+classifierType=p;
 
 
 if(classifierType==1)
@@ -132,11 +134,11 @@ ConfusionMatrices(101).confdata=zeros(NClass);
 k=0;
 for alfa=0:0.01:1
     k=k+1;
-    fused=prob3d*(1-alfa)+prob*alfa;
-    [val ind]=max(fused,[],2);
+    fused = decisionFuser( prob3d, prob, alfa);
+    [val ind]=min(fused,[],2);
     fusedLabel=ind;
 predictLabels = fusedLabel;
-testLabels = extractfield(acc, 'testLabel');
+testLabels = extractfield(folds, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
     ConfusionMatrices(k).confdata(i,j) = sum(predictLabels(testLabels==i)==j);
@@ -168,7 +170,7 @@ plot(xax,ave_acc);title(['maximum accuracy ' num2str(100*maxacc) '% for alfa='  
 
 ConfusionMatrix=ConfusionMatrices(maxind).confdata;
 
-saveName=['./EXPproper/GMM' saveName1,saveName2];
+saveName=['./EXPproper/GMM' saveName1,saveName2,'comRange13another'];
 saveas(gcf, saveName, 'fig');
 save(saveName);
-    
+end 
