@@ -35,14 +35,13 @@ for N = comRange(1):comRange(2):comRange(3),
         
         testData=trainData(test_ind);
         testLabel=trainLabel(test_ind);
-        Pos=zeros(length(testData),NClass);
-        for k=1:length(testData)
+        Pos=zeros(length(testLabel),NClass);
+        for k=1:length(testLabel)
             for class=1:NClass
                 [~,Pos(j,class)] = posterior(model(class).obj,testData(k).data);
             end
         end
         [v ix] = sort(Pos,2);
-        pred=ix(:,1);
         ac = ac + sum(ix(:,1)==testLabel);
     end
     ac = ac / length(trainLabel);
