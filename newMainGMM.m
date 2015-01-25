@@ -66,12 +66,12 @@ end
 
 
 %% nfold test
-CV(nfold).model=[];
+folds(nfold).bestCom=[];
 IDs=unique(extractfield(AffectDataSync,'id'));
 len=length(IDs);
 load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
-parfor i=1:nfold % nfold test
+for i=1:nfold % nfold test
   train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
   train_id = rand_id;
@@ -90,7 +90,9 @@ parfor i=1:nfold % nfold test
   testLabel=label(test_ind);
   
   [ model, bestCom, cv ] = CVtrainGMM(trainData, trainLabel, comRange, nfoldCV);
-
+    folds(i).model=model;
+    folds(i).bestCom=bestCom;
+    folds(i).cv=cv;
 Pos=zeros(length(testData),NClass);
 for j=1:length(testData) 
     for class=1:NClass
