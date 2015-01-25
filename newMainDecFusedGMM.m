@@ -58,7 +58,7 @@ len=length(IDs);
 load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
 
-for i=1:nfold % nfold test
+parfor i=1:nfold % nfold test
   train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
   train_id = rand_id;
@@ -93,11 +93,11 @@ for i=1:nfold % nfold test
     folds(i).prob_values = Pos;
     
     %%%%% be careful this is not nice
-    for i=1:length(trainData)
-        trainData(i).data=trainData(i).data3d;
+    for k=1:length(trainData)
+        trainData(k).data=trainData(k).data3d;
     end
-    for i=1:length(testData)
-        testData(i).data=testData(i).data3d;
+    for k=1:length(testData)
+        testData(k).data=testData(k).data3d;
     end
     %%%%%
     
