@@ -14,7 +14,7 @@ nfoldCV=3;
 nfold = 10;
 
 % detection 1, recognition 2
-classifierType=2;
+classifierType=1;
 
 % audio 1, video 2, feature fusion 3
 modality=3;
@@ -45,7 +45,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-comRange=[1,1,3];
+comRange=[1,1,5];
 
 if(modality==1) %audio
     saveName2='Audio';
