@@ -69,13 +69,13 @@ parfor i=1:nfold % nfold test
   for k=1:length(train_id)
       train_ind=[train_ind;find(extractfield(AffectDataSync,'id')==train_id(k))'];
   end
-  trainData=AffectDataSync(train_ind,:);
+  trainData=AffectDataSync(train_ind);
   trainLabel=label(train_ind);
   
   for k=1:length(test_id)
       test_ind=[test_ind;find(extractfield(AffectDataSync,'id')==test_id(k))'];
   end
-  testData=AffectDataSync(test_ind,:);
+  testData=AffectDataSync(test_ind);
   testLabel=label(test_ind);
   
   %%%% audio part
