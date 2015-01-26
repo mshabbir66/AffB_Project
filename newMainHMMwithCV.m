@@ -1,10 +1,19 @@
-function newMainHMM(noS,noM)
+clc
+close all
+clear all
+
+% AffectDataSync = createAffectDataSync;
+% save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
 
 load ./Dataset/AffectDataSyncN
+
 % Removing Other class
 AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
 
+nfoldCV = 3;
 nfold = 10;
+
+
 
 % detection 1, recognition 2
 classifierType=2;
@@ -44,30 +53,14 @@ NClass = length(labelList);
 
 %% nfold test
 CV(nfold).model=[];
-CV3D(nfold).model = [];
-
-accCombined(nfold).predict_label =[];
-
-acc(nfold).accuracy = [];
-acc(nfold).testLabel = [];
-acc(nfold).predict_label = [];
-acc(nfold).prob_values = [];
-
-acc3D(nfold).accuracy = [];
-acc3D(nfold).testLabel = [];
-acc3D(nfold).predict_label = [];
-acc3D(nfold).prob_values = [];
-
 IDs=unique(extractfield(AffectDataSync,'id'));
 len=length(IDs);
 load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
-
 alfa=0.5;
-%noS  = 4;
-%noM = 4;
 
-parfor i=1:nfold % nfold test
+
+for i=1:nfold % nfold test
     train_ind=[];test_ind=[];
     test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
     train_id = rand_id;
@@ -107,27 +100,31 @@ parfor i=1:nfold % nfold test
         testData3D{k} = testData3D{k}';
     end
        
-    [CV(i).model ]= trainHMMGMM(trainDataSound, trainLabel,noS,noM);
+    %[CV(i).model ]= trainHMMGMM(trainDataSound, trainLabel);
+    [ CV(i).model, bestComS, cvS ] = CVtrainHMM(trainData,trainDataSound, trainLabel, 1:1:4, nfoldCV);
     
     [predict_label,~, prob_values] = testHMMGMM(testLabel, testDataSound, CV(i).model);
     
+    
+
     acc(i).accuracy=sum(testLabel==predict_label)/length(predict_label);
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
     acc(i).prob_values = prob_values;
 
-    [CV3D(i).model ]= trainHMMGMM(trainData3D, trainLabel,noS,noM);
+    [CV3D(i).model, CV3D(i).bestCom, CV3D(i).cv ] = CVtrainHMM(trainData,trainData3D, trainLabel, 1:1:4, nfoldCV);
+    %[CV(i).model ]= trainHMMGMM(trainData3D, trainLabel);
     
     [predict_label,~, prob_values] = testHMMGMM(testLabel, testData3D, CV3D(i).model);
     
-    acc3D(i).accuracy=sum(testLabel==predict_label)/length(predict_label);
-    acc3D(i).testLabel = testLabel;
-    acc3D(i).predict_label = predict_label;
-    acc3D(i).prob_values = prob_values;
+    acc3d(i).accuracy=sum(testLabel==predict_label)/length(predict_label);
+    acc3d(i).testLabel = testLabel;
+    acc3d(i).predict_label = predict_label;
+    acc3d(i).prob_values = prob_values;
     %subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
         
-    [ fusedLabel] = decisionFuserModified( acc3D(i).prob_values,acc(i).prob_values, 0.5);
-    [val, ind]=max(fusedLabel,[],2);
+    [ fusedLabel2] = decisionFuser( acc3d(i).prob_values,acc(i).prob_values, 0.5);
+    [val ind]=max(fusedLabel2,[],2);
     
     accCombined(i).predict_label = ind;
     
@@ -136,48 +133,8 @@ end
 
 
 %% confusion matrix
-
-% ConfusionMatrices(101).confdata=zeros(NClass);
-% k=0;
-% 
-% for alfa=0:0.01:1
-%     k=k+1;
-%     fused=prob3d*(1-alfa)+prob*alfa;
-%     [val, ind]=max(fused,[],2);
-%     fusedLabel=ind;
-% predictLabels = fusedLabel;
-% testLabels = extractfield(acc, 'testLabel');
-% for i =1:NClass
-%     for j = 1:NClass
-%     ConfusionMatrices(k).confdata(i,j) = sum(predictLabels(testLabels==i)==j);
-%     end
-% end
-% ConfusionMatrixSensitivity = ConfusionMatrices(k).confdata./(sum(ConfusionMatrices(k).confdata,2)*ones(1,NClass));
-% ConfusionMatrixPrecision = ConfusionMatrices(k).confdata./(ones(NClass,1)*sum(ConfusionMatrices(k).confdata,1));
-% 
-% %% plot and metrics
-% % figure;
-% % bar3(ConfusionMatrix');
-% % ax = gca;
-% % set(ax,'XTickLabel',axlabels);
-% % set(ax,'YTickLabel',axlabels);
-% % xlabel('GT');
-% % ylabel('P');
-% 
-% Precision(k) = mean(diag(ConfusionMatrixPrecision));
-% Sensitivity(k) = mean(diag(ConfusionMatrixSensitivity));
-% 
-% ave_acc(k)=sum(diag(ConfusionMatrices(k).confdata))/sum(sum(ConfusionMatrices(k).confdata));
-% % title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
-% 
-% end
-
-
 predictLabels = extractfield(accCombined, 'predict_label');
 testLabels = extractfield(acc, 'testLabel');
-
-ConfusionMatrix(NClass,NClass) = 0;
-
 for i =1:NClass
     for j = 1:NClass
         ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);
@@ -201,7 +158,6 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
- saveName=['./EXPproper/HMMGMMDecFused-',num2str(noS),'-',num2str(noM)];
- 
- saveas(gcf, saveName, 'fig');
- save(saveName);
+% saveName=['./EXPproper/' saveName1,saveName2];
+% saveas(gcf, saveName, 'fig');
+% save(saveName);
