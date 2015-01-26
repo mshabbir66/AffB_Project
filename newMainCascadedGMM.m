@@ -100,7 +100,7 @@ for i=1:nfold % nfold test
   testDataDetect=AffectDataSync(test_ind);
   
   trainLabelRec = label(train_ind);
-  trainDataRec=AffectDataSync(train_ind,:);
+  trainDataRec=AffectDataSync(train_ind);
   trainDataRec(trainLabelRec == REJECT) = [];
   trainLabelRec(trainLabelRec == REJECT) = [];
   
@@ -109,7 +109,7 @@ for i=1:nfold % nfold test
   [ foldsRec(i).model ] = trainGMM(trainDataRec, trainLabelRec, com);
 
   
-  Pos=zeros(length(testDataDetect),NClass);
+  Pos=zeros(length(testDataDetect),2);
     for j=1:length(testDataDetect) 
         for class=1:2
             [~,Pos(j,class)] = posterior(foldsDet(i).model(class).obj,testDataDetect(j).data);           
