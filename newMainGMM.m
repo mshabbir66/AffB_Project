@@ -1,5 +1,5 @@
 clear all;
-for p=1:2
+for p=2:2
 clc
 close all
 clearvars -except p
@@ -109,8 +109,8 @@ end
 
 
 %% confusion matrix
-predictLabels = extractfield(acc, 'predict_label');
-testLabels = extractfield(acc, 'testLabel');
+predictLabels = extractfield(folds, 'predict_label');
+testLabels = extractfield(folds, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
     ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);
