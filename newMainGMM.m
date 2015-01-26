@@ -1,5 +1,5 @@
 clear all;
-for p=2:2
+for p=1:6
 clc
 close all
 clearvars -except p
@@ -17,10 +17,10 @@ nfold = 10;
 
 
 % detection 1, recognition 2
-classifierType=p;
+classifierType=ceil(p/3);
 
 % audio 1, video 2, feature fusion 3
-modality=3;
+modality=mod(p,3)+1;
 
 
 if(classifierType==1)
