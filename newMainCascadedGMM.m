@@ -14,7 +14,11 @@ nfold = 10;
 
 
 % audio 1, video 2, feature fusion 3
+<<<<<<< HEAD
 modality=p;
+=======
+modality=2;
+>>>>>>> origin/gmm
 
 
     LAUGHTER = 1;
