@@ -14,12 +14,7 @@ nfold = 10;
 
 
 % audio 1, video 2, feature fusion 3
-<<<<<<< HEAD
 modality=p;
-=======
-modality=2;
->>>>>>> origin/gmm
-
 
     LAUGHTER = 1;
     BREATHING = 2;
@@ -67,7 +62,7 @@ rand_ind = randperm(len);
 load ('rand_ind.mat','rand_ind');
 rand_id = IDs(rand_ind);
 
-parfor i=1:nfold % nfold test
+for i=1:nfold % nfold test
   train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
   train_id = rand_id;
