@@ -48,7 +48,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-comRange=[1,1,3];
+com=8;
 
 if(modality==1) %audio
     saveName2='Audio';
@@ -88,11 +88,9 @@ parfor i=1:nfold % nfold test
   end
   testData=AffectDataSync(test_ind,:);
   testLabel=label(test_ind);
-  
-  [ model, bestCom, cv ] = CVtrainGMM(trainData, trainLabel, comRange, nfoldCV);
+ 
+  [ model ] =  trainGMM(trainData, trainLabel, com );
     folds(i).model=model;
-    folds(i).bestCom=bestCom;
-    folds(i).cv=cv;
 Pos=zeros(length(testData),NClass);
 for j=1:length(testData) 
     for class=1:NClass

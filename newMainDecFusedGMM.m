@@ -47,7 +47,7 @@ label(strcmp(LABEL,'REJECT')) = REJECT;
 
 labelList = unique(label);
 NClass = length(labelList);
-comRange=[1,1,3];
+com=8;
 
 saveName2='DecFused';
 
@@ -79,10 +79,8 @@ parfor i=1:nfold % nfold test
   testLabel=label(test_ind);
   
   %%%% audio part
-  [ model, bestCom, cv ] = CVtrainGMM(trainData, trainLabel, comRange, nfoldCV);
+  [ model ] =  trainGMM(trainData, trainLabel, com );
     folds(i).model=model;
-    folds(i).bestCom=bestCom;
-    folds(i).cv=cv;
     Pos=zeros(length(testData),NClass);
     for j=1:length(testData) 
         for class=1:NClass
@@ -104,10 +102,8 @@ parfor i=1:nfold % nfold test
     %%%%%
     
     %%%%%%%%% 3d part
-    [ model, bestCom, cv ] = CVtrainGMM(trainData, trainLabel, comRange, nfoldCV);
+    [ model ] =  trainGMM(trainData, trainLabel, com );
     folds3d(i).model=model;
-    folds3d(i).bestCom=bestCom;
-    folds3d(i).cv=cv;
     Pos=zeros(length(testData),NClass);
     for j=1:length(testData) 
         for class=1:NClass
