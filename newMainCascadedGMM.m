@@ -63,6 +63,7 @@ end
 %% nfold test
 foldsDet(nfold).model=[];
 foldsRec(nfold).model=[];
+acc3(nfold).testLabel=[];
 
 IDs=unique(extractfield(AffectDataSync,'id'));
 len=length(IDs);
@@ -70,7 +71,7 @@ rand_ind = randperm(len);
 load ('rand_ind.mat','rand_ind');
 rand_id = IDs(rand_ind);
 
-parfor i=1:nfold % nfold test
+for i=1:nfold % nfold test
   train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
   train_id = rand_id;
@@ -110,7 +111,7 @@ parfor i=1:nfold % nfold test
   
   Pos=zeros(length(testDataDetect),NClass);
     for j=1:length(testDataDetect) 
-        for class=1:NClass
+        for class=1:2
             [~,Pos(j,class)] = posterior(foldsDet(i).model(class).obj,testDataDetect(j).data);           
         end
     end    
