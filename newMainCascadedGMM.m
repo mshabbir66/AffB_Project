@@ -14,7 +14,7 @@ nfold = 10;
 classifierType=2;
 
 % audio 1, video 2, feature fusion 3
-modality=1;
+modality=2;
 
 
 if(classifierType==1)
