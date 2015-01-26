@@ -148,7 +148,7 @@ end
 %acc = acc1(~isnan(extractfield(acc1,'accuracy')));
 
 %% confusion matrix
-for i = 1:length(acc1)
+for i = 1:length(foldsDet)
 acc3(i).predict_label = foldsDet(i).predict_label;
 acc3(i).predict_label(acc3(i).predict_label==2) = 3;
 acc3(i).predict_label(acc3(i).predict_label==1) = foldsRec(i).predict_label;
