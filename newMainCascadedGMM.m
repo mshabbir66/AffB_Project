@@ -116,7 +116,6 @@ for i=1:nfold % nfold test
         end
     end    
     [v ix] = sort(Pos,2);
-    %acc=sum(ix(:,1)==testLabel)/length(testLabel);
     foldsDet(i).testLabel = testLabelDetect;
     foldsDet(i).predict_label = ix(:,1);
     foldsDet(i).prob_values = Pos;
@@ -127,9 +126,9 @@ for i=1:nfold % nfold test
    testDataRec = testDataRec(foldsDet(i).predict_label==1);
    
    
-   Pos=zeros(length(testDataRec),NClass);
+   Pos=zeros(length(testDataRec),NClass-1);
     for j=1:length(testDataRec) 
-        for class=1:NClass
+        for class=1:NClass-1
             [~,Pos(j,class)] = posterior(foldsRec(i).model(class).obj,testDataRec(j).data);           
         end
     end    
