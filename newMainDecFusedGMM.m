@@ -166,7 +166,7 @@ plot(xax,ave_acc);title(['maximum accuracy ' num2str(100*maxacc) '% for alfa='  
 
 ConfusionMatrix=ConfusionMatrices(maxind).confdata;
 
-saveName=['./EXPproper/GMM' saveName1,saveName2,'comRange13another'];
+saveName=['./EXPproper/GMM' saveName1,saveName2];
 saveas(gcf, saveName, 'fig');
 save(saveName);
 end 
