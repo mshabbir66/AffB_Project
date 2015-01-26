@@ -136,7 +136,7 @@ for alfa=0:0.01:1
     [val ind]=min(fused,[],2);
     fusedLabel=ind;
 predictLabels = fusedLabel;
-testLabels = extractfield(acc, 'testLabel');
+testLabels = extractfield(folds, 'testLabel');
 for i =1:NClass
     for j = 1:NClass
     ConfusionMatrices(k).confdata(i,j) = sum(predictLabels(testLabels==i)==j);
