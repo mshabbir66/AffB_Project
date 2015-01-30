@@ -45,8 +45,8 @@ saveName2='Fused';
 
 files=[];
 for i=1:4
-    file=dir(['../Session' num2str(i) '/dialog/wav']);
-    file=file(3:end,:);
+    file=dir(['../Session' num2str(i) '/dialog/wav/*.wav']);
+    
     files=[files;file];
 end
 len=length(files);
