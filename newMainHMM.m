@@ -1,4 +1,4 @@
-function [predictLabels] = newMainHMM(noS,noM,classifierType)
+%function [predictLabels] = newMainHMM(noS,noM,classifierType)
 
 load ./Dataset/AffectDataSyncN
 % Removing Other class
@@ -67,7 +67,7 @@ alfa=0.5;
 %noS  = 4;
 %noM = 4;
 
-parfor i=1:nfold % nfold test
+for i=1:nfold % nfold test
     train_ind=[];test_ind=[];
     test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
     train_id = rand_id;

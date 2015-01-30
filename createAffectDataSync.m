@@ -44,6 +44,7 @@ for j  = 1:length(Samples)
         AffectDataSync(end,:).id = idcount;
         AffectDataSync(end,:).label = Samples(j).type;
         AffectDataSync(end,:).sesNumber = str2num(Samples(j).fileName(5));
+        AffectDataSync(end,:).fileName = Samples(j).fileName;
         i  =i + 1;
         
     end
