@@ -91,18 +91,22 @@ for k=1:10 % Cross training : folding
     trainData=AffectDataSync;
     trainLabel=label;
     
-    trainDataCell = struct2cell(trainData);
-    %select sound
-    trainDataSound = trainDataCell(2,:)';
-    trainData3D = trainDataCell(1,:)';
+    [ modelSound ] =  trainGMMAudio(trainData, trainLabel, com );
+    [ modelVideo ] =  trainGMMVideo(trainData, trainLabel, com );
+
     
-    for kr = 1:length(trainData)
-        trainDataSound{kr} = trainDataSound{kr}';
-        trainData3D{kr} = trainData3D{kr}';
-    end
-    
-    [CV.model ]= trainHMMGMM(trainDataSound, trainLabel,4,4);
-    [CV3D.model ]= trainHMMGMM(trainData3D, trainLabel,4,4);
+%     trainDataCell = struct2cell(trainData);
+%     %select sound
+%     trainDataSound = trainDataCell(2,:)';
+%     trainData3D = trainDataCell(1,:)';
+%     
+%     for kr = 1:length(trainData)
+%         trainDataSound{kr} = trainDataSound{kr}';
+%         trainData3D{kr} = trainData3D{kr}';
+%     end
+%     
+%     [CV.model ]= trainHMMGMM(trainDataSound, trainLabel,4,4);
+%     [CV3D.model ]= trainHMMGMM(trainData3D, trainLabel,4,4);
    
     
     %% test
@@ -138,8 +142,8 @@ for k=1:10 % Cross training : folding
         while winSize+ winShift*i < length(y) && winSize3d+ winShift3d*i < size(text{1,3},1)
             PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
             MFCCs = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
-            clipStats(count).AffectDataSync(end+1,1).Audio=MFCCs; 
-            clipStats(count).AffectDataSync(end,1).Video=PCAcoef;
+            clipStats(count).AffectDataSync(end+1,1).data=MFCCs; 
+            clipStats(count).AffectDataSync(end,1).data3d=PCAcoef;
             i = i + 1;
         end
         if ((winSize3d+ winShift3d*i < size(text{1,3},1))==0)
@@ -151,25 +155,13 @@ for k=1:10 % Cross training : folding
         % feature fusion
         %% check the order here!!
         testData=clipStats(count).AffectDataSync;
-        testDataCell = struct2cell(testData);
-        %select sound
-        testDataSound = testDataCell(1,:)';
-        testData3D = testDataCell(2,:)';
-         
-        for kr = 1:length(testData)
-            testDataSound{kr} = testDataSound{kr}';
-            testData3D{kr} = testData3D{kr}';
-        end
+        
+        [prob,~] = TestGMMAudio(testData,model);
+        [prob3d,~] = TestGMMVideo(testData,model);
+        fused = decisionFuser( prob3d, prob, alfa);
+        [val ind]=min(fused,[],2);
+        predict_label=ind;
        
-        [~,~, prob_valuesSound] = testHMMGMM(0, testDataSound, CV.model);
-        [~,~, prob_values3D] = testHMMGMM(0, testData3D, CV3D.model);
-        predict_label = decisionFuserModified( prob_valuesSound, prob_values3D, 0.5);
-        [~, predict_label]=min(predict_label,[],2);
-        
-        %unseenStats=[clipStats(count).audio clipStats(count).visual];
-        
-        %[predict_label, ~ ,prob_values] = svmpredict(zeros(size(unseenStats,1),1), unseenStats, model);
-
         %% ground truth compare
         labelmap = containers.Map;
         labelmap('Laughter') = LAUGHTER;
@@ -184,7 +176,6 @@ for k=1:10 % Cross training : folding
         t=0:1/1000:length(real_label)/1000-1/1000;
         twin=0:shiftms/1000:length(real_label)/1000-shiftms/1000;
         real_label_scaled = zeros(size(predict_label));
-        predict_label_r_d = zeros(size(predict_label));
 
         twin=twin(2:end-1);
         for i =2:length(twin)
@@ -192,21 +183,6 @@ for k=1:10 % Cross training : folding
         end
         real_label_scaled(real_label_scaled==0) = REJECT;
         
-%         predict_comb=(predict_label~=REJECT);
-%         mask=zeros(size(predict_label));
-%         for i =6:length(twin)-5
-%             mask(i) = median(predict_comb(i-5:i+5,1));
-%         end
-%         predict_label_r_d=predict_label & mask;
-
-%         for i =6:length(twin)-5
-%             predict_label_r_d(i) = median(predict_label(i-5:i+5,1));
-%         end
-% 
-%         predict_label_temp=[predict_label(1:5);predict_label;predict_label(end-6:end)];
-%         for i =1:length(twin)
-%             predict_label_r_d(i) = median(predict_label_temp(i:i+10,1));
-%         end
 
         %% Plots
         figure(count);
