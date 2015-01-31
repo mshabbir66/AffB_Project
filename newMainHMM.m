@@ -67,7 +67,7 @@ rand_id = IDs(rand_ind);
 %noS  = 4;
 %noM = 2;
 
-for i=1:nfold % nfold test
+parfor i=1:nfold % nfold test
     train_ind=[];test_ind=[];
     test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
     train_id = rand_id;
