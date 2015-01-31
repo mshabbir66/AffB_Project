@@ -1,4 +1,4 @@
-function [prob_values,predict_label] = TestGMMVideo(testData,model)
+function [prob_values,predict_label] = TestGMMVideo(testData,model,NClass)
 
     Pos=zeros(length(testData),NClass);
     for j=1:length(testData) 

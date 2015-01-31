@@ -64,8 +64,8 @@ load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
 
 alfa=0.5;
-%noS  = 4;
-%noM = 4;
+noS  = 4;
+noM = 2;
 
 for i=1:nfold % nfold test
     train_ind=[];test_ind=[];

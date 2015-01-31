@@ -17,8 +17,10 @@ winShift = shiftms/1000*fs;
 winSize3d  = winms/1000*Vfs;
 winShift3d = shiftms/1000*Vfs;
 
-nfoldCV = 3;
 nfold = 10;
+
+com=8;
+alfa = 0.3;
 
 % detection 1, recognition 2
 classifierType=2;
@@ -39,9 +41,7 @@ else
     saveName1='Recognition';
 end
 
-cRange=[-2 4 46];
-gRange=[-13 1 -10];
-saveName2='Fused';
+
 
 files=[];
 for i=1:4
@@ -91,8 +91,8 @@ for k=1:10 % Cross training : folding
     trainData=AffectDataSync;
     trainLabel=label;
     
-    [ modelSound ] =  trainGMMAudio(trainData, trainLabel, com );
-    [ modelVideo ] =  trainGMMVideo(trainData, trainLabel, com );
+    [ modelSound ] =  TrainGMMAudio(trainData, trainLabel, com );
+    [ modelVideo ] = TrainGMMVideo(trainData, trainLabel, com );
 
     
 %     trainDataCell = struct2cell(trainData);
@@ -156,8 +156,8 @@ for k=1:10 % Cross training : folding
         %% check the order here!!
         testData=clipStats(count).AffectDataSync;
         
-        [prob,~] = TestGMMAudio(testData,model);
-        [prob3d,~] = TestGMMVideo(testData,model);
+        [prob,~] = TestGMMAudio(testData,modelSound,NClass);
+        [prob3d,~] = TestGMMVideo(testData,modelVideo,NClass);
         fused = decisionFuser( prob3d, prob, alfa);
         [val ind]=min(fused,[],2);
         predict_label=ind;

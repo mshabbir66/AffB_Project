@@ -1,4 +1,4 @@
-function [prob_values,predict_label] = TestGMMAudio(testData,model)
+function [prob_values,predict_label] = TestGMMAudio(testData,model,NClass)
 
     Pos=zeros(length(testData),NClass);
     for j=1:length(testData) 

@@ -164,7 +164,7 @@ for k=1:10 % Cross training : folding
         [~,~, prob_valuesSound] = testHMMGMM(0, testDataSound, CV.model);
         [~,~, prob_values3D] = testHMMGMM(0, testData3D, CV3D.model);
         predict_label = decisionFuserModified( prob_valuesSound, prob_values3D, 0.5);
-        [~, predict_label]=min(predict_label,[],2);
+        [~, predict_label]=max(predict_label,[],2);
         
         %unseenStats=[clipStats(count).audio clipStats(count).visual];
         
