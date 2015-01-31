@@ -106,7 +106,7 @@ parfor i=1:nfold % nfold test
         testDataSound{k} = testDataSound{k}';
         testData3D{k} = testData3D{k}';
     end
-       
+    
     [CV(i).model ]= trainHMMGMM(trainDataSound, trainLabel,noS,noM);
     
     [predict_label,~, prob_values] = testHMMGMM(testLabel, testDataSound, CV(i).model);
@@ -115,7 +115,7 @@ parfor i=1:nfold % nfold test
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
     acc(i).prob_values = prob_values;
-
+    
     [CV3D(i).model ]= trainHMMGMM(trainData3D, trainLabel,noS,noM);
     
     [predict_label,~, prob_values] = testHMMGMM(testLabel, testData3D, CV3D(i).model);
@@ -125,7 +125,7 @@ parfor i=1:nfold % nfold test
     acc3D(i).predict_label = predict_label;
     acc3D(i).prob_values = prob_values;
     %subplot(ceil(nfold/5),5,i);imagesc(CV(i).grid);drawnow;
-        
+    
     [ fusedLabel] = decisionFuserModified( acc3D(i).prob_values,acc(i).prob_values, 0.5);
     [val, ind]=max(fusedLabel,[],2);
     
@@ -138,7 +138,6 @@ end
 %% confusion matrix
 
 ConfusionMatrices(101).confdata=zeros(NClass);
-k=0;
 
 prob3d=[];prob=[];
 for i=1:nfold
@@ -146,6 +145,9 @@ for i=1:nfold
     prob=[prob;acc(i).prob_values];
 end
 
+testLabels = extractfield(acc, 'testLabel');
+
+k=0;
 for alfa=0:0.01:1
     k=k+1;
     fused = decisionFuserModified( prob, prob3d, alfa);
@@ -153,7 +155,6 @@ for alfa=0:0.01:1
     [val, ind]=max(fused,[],2);
     fusedLabel=ind;
     predictLabels = fusedLabel;
-    testLabels = extractfield(acc, 'testLabel');
     for i =1:NClass
         for j = 1:NClass
             ConfusionMatrices(k).confdata(i,j) = sum(predictLabels(testLabels==i)==j);
@@ -162,45 +163,31 @@ for alfa=0:0.01:1
     ConfusionMatrixSensitivity = ConfusionMatrices(k).confdata./(sum(ConfusionMatrices(k).confdata,2)*ones(1,NClass));
     ConfusionMatrixPrecision = ConfusionMatrices(k).confdata./(ones(NClass,1)*sum(ConfusionMatrices(k).confdata,1));
     
-    %% plot and metrics
-    % figure;
-    % bar3(ConfusionMatrix');
-    % ax = gca;
-    % set(ax,'XTickLabel',axlabels);
-    % set(ax,'YTickLabel',axlabels);
-    % xlabel('GT');
-    % ylabel('P');
-    
     Precision(k) = mean(diag(ConfusionMatrixPrecision));
     Sensitivity(k) = mean(diag(ConfusionMatrixSensitivity));
     
     ave_acc(k)=sum(diag(ConfusionMatrices(k).confdata))/sum(sum(ConfusionMatrices(k).confdata));
-    % title(['Confusion Matrix, alfa: ' num2str(alfa) ' Acc: ' num2str(100*ave_acc(k)) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
     
 end
 
 [maxacc, maxind]=max(ave_acc);
-figure;
+
+
+figure(1)
 xax=0:0.01:1;
 plot(xax,ave_acc);title(['maximum accuracy ' num2str(100*maxacc) '% for alfa='  num2str(xax(maxind))]);
+
 ConfusionMatrix=ConfusionMatrices(maxind).confdata;
 best_alpha = xax(maxind);
 
-predictLabels = extractfield(accCombined, 'predict_label');
-testLabels = extractfield(acc, 'testLabel');
-
-ConfusionMatrix(NClass,NClass) = 0;
-
-for i =1:NClass
-    for j = 1:NClass
-        ConfusionMatrix(i,j) = sum(predictLabels(testLabels==i)==j);
-    end
-end
 ConfusionMatrixSensitivity = ConfusionMatrix./(sum(ConfusionMatrix,2)*ones(1,NClass));
 ConfusionMatrixPrecision = ConfusionMatrix./(ones(NClass,1)*sum(ConfusionMatrix,1));
+Precision = mean(diag(ConfusionMatrixPrecision));
+Sensitivity = mean(diag(ConfusionMatrixSensitivity));
+ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 
 %% plot and metrics
-figure;
+figure(2);
 bar3(ConfusionMatrix');
 ax = gca;
 set(ax,'XTickLabel',axlabels);
@@ -208,13 +195,9 @@ set(ax,'YTickLabel',axlabels);
 xlabel('GT');
 ylabel('P');
 
-Precision = mean(diag(ConfusionMatrixPrecision));
-Sensitivity = mean(diag(ConfusionMatrixSensitivity));
-
-ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
- saveName=['./EXPproper/HMMGMMDecFused-',num2str(noS),'-',num2str(noM)];
- 
- saveas(gcf, saveName, 'fig');
- save(saveName);
+saveName=['./EXPproper/HMMGMMDecFused-',num2str(noS),'-',num2str(noM)];
+
+saveas(gcf, saveName, 'fig');
+save(saveName);
