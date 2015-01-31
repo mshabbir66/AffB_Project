@@ -1,4 +1,4 @@
-%function [predictLabels] = newMainHMM(noS,noM,classifierType)
+function [predictLabels] = newMainHMM(noS,noM,classifierType)
 
 load ./Dataset/AffectDataSyncN
 % Removing Other class
@@ -63,9 +63,9 @@ len=length(IDs);
 load rand_ind.mat%rand_ind = randperm(len);
 rand_id = IDs(rand_ind);
 
-alfa=0.5;
-noS  = 4;
-noM = 2;
+%alfa=0.5;
+%noS  = 4;
+%noM = 2;
 
 for i=1:nfold % nfold test
     train_ind=[];test_ind=[];
@@ -214,7 +214,7 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2str(100*mean(Precision)) '% Recall: ' num2str(100*mean(Sensitivity)) '%']);
 
- saveName=['./EXPproper/HMMGMMDetectionDecFused-',num2str(noS),'-',num2str(noM)];
+ saveName=['./EXPproper/HMMGMMDecFused-',num2str(noS),'-',num2str(noM)];
  
  saveas(gcf, saveName, 'fig');
  save(saveName);
