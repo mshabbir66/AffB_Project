@@ -62,7 +62,7 @@ for k=1:10 % Cross training : folding
     testFiles=files(test_ind);
 
 
-    load ./Dataset/AffectDataSyncNew
+    load ./Dataset/AffectDataSyncN
     % Removing Other class
     AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
       for i=1:length(testFiles)
