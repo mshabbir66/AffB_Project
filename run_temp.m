@@ -1,2 +1,2 @@
-newMainDecFusedGMM;
 newMainGMM;
+newMainDecFusedGMM;

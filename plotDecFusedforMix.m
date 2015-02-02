@@ -1,11 +1,11 @@
 
-mlist=[2,4,8,16];
+mlist=[2,4,8,16,32];
 figure;
-for j=1:4
-    load(['EXPproper/GMMRecognitionDecFusedmix' num2str(mlist(j))],'ConfusionMatrix','xax','maxind','ave_acc');
+for j=1:5
+    load(['EXPproper/GMMRecognitionDecFusedmix' num2str(mlist(j))],'ConfusionMatrix','xax','maxind','ave_acc','axlabels','NClass');
     for i=1:2
-        subplot(2,4,(i-1)*4+j);
-        plot(xax,ave_acc);title(['#mix ' num2str(mlist(j)) ' max acc ' num2str(100*maxacc) '% for alpha='  num2str(xax(maxind))]);
+        subplot(2,5,(i-1)*5+j);
+        plot(xax,ave_acc);title(['#mix ' num2str(mlist(j)) ' acc ' num2str(100*ave_acc(maxind),'%.2f') '% alpha='  num2str(xax(maxind))]);
         xlabel('alpha');ylabel('accuracy');
        if(i==2)
            
@@ -21,7 +21,7 @@ for j=1:4
            Precision = mean(diag(ConfusionMatrixPrecision));
            Sensitivity = mean(diag(ConfusionMatrixSensitivity));
            
-           title(['Acc: ' num2str(100*ave_acc(maxind)) '% Pre: ' num2str(100*mean(Precision)) '% Rec: ' num2str(100*mean(Sensitivity)) '%']);
+           title(['Acc ' num2str(100*ave_acc(maxind),'%.2f') '% P ' num2str(100*mean(Precision),'%.2f') '% R ' num2str(100*mean(Sensitivity),'%.2f') '%']);
 
        end
     end
