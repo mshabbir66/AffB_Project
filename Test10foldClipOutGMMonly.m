@@ -62,7 +62,7 @@ for k=1:10 % Cross training : folding
     testFiles=files(test_ind);
 
 
-    load ./Dataset/AffectDataSyncN
+    load ./Dataset/AffectDataSyncNew
     % Removing Other class
     AffectDataSync(strcmp(extractfield(AffectDataSync,'label'),'Other'))=[];
       for i=1:length(testFiles)
@@ -185,7 +185,7 @@ for k=1:10 % Cross training : folding
         
 
         %% Plots
-        figure(count);
+        figure(mod(count,10)+1);
         subplot(2,1,1);
         bar(twin,predict_label==LAUGHTER,'b','EdgeColor','None');
         hold on;
