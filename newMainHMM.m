@@ -1,4 +1,10 @@
-function [predictLabels] = newMainHMM(noS,noM,classifierType)
+function [predictLabels] = newMainHMM(noS,noM)
+%close all
+%clear all
+
+%noS = 4;
+%noM = 2;
+
 
 load ./Dataset/AffectDataSyncN
 % Removing Other class
@@ -173,9 +179,9 @@ end
 [maxacc, maxind]=max(ave_acc);
 
 
-figure(1)
+%figure(1)
 xax=0:0.01:1;
-plot(xax,ave_acc);title(['maximum accuracy ' num2str(100*maxacc) '% for alfa='  num2str(xax(maxind))]);
+%plot(xax,ave_acc);title(['maximum accuracy ' num2str(100*maxacc) '% for alfa='  num2str(xax(maxind))]);
 
 ConfusionMatrix=ConfusionMatrices(maxind).confdata;
 best_alpha = xax(maxind);
@@ -187,8 +193,8 @@ Sensitivity = mean(diag(ConfusionMatrixSensitivity));
 ave_acc=sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix));
 
 %% plot and metrics
-figure(2);
-bar3(ConfusionMatrix');
+%figure(2);
+%bar3(ConfusionMatrix');
 ax = gca;
 set(ax,'XTickLabel',axlabels);
 set(ax,'YTickLabel',axlabels);
@@ -199,5 +205,5 @@ title(['Confusion Matrix, ' ' Acc: ' num2str(100*ave_acc) '% Precision: ' num2st
 
 saveName=['./EXPproper/HMMGMMDecFused-',num2str(noS),'-',num2str(noM)];
 
-saveas(gcf, saveName, 'fig');
+%saveas(gcf, saveName, 'fig');
 save(saveName);
