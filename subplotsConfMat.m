@@ -14,7 +14,7 @@ figure('Position',[50 50 1000 600]);
 for i=1:8
     load(['EXPproper/' matNames{i}],'ConfusionMatrix');
     subplot(2,4,i);
-    plotConfusionMat;title(['Accuracy: ' num2str(100*sum(diag(ConfusionMatrix))/sum(sum(ConfusionMatrix)),'%.2f') '%']);
+    plotConfusionMat;title(['UA acc: ' num2str(100*( ConfusionMatrix(1,1)/sum(ConfusionMatrix(1,:)) + ConfusionMatrix(2,2)/sum(ConfusionMatrix(2,:)) + ConfusionMatrix(3,3)/sum(ConfusionMatrix(3,:)) )/3 ,'%.2f') '%']);
     axis equal;axis tight;
 end
 
