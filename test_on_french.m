@@ -1,9 +1,8 @@
-function [predict_label_r_d, real_label_scaled]=test_on_french(audioPath,EmotionEvents)
+function [predict_label_r_d, real_label_scaled]=test_on_french(audioPath,EmotionEvents,featurePath,filterSizePred)
 
 LAUGHTER = 1;
 BREATHING = 2;
 REJECT = 3;
-
 
 file=audioPath(end-21:end-4);
 %% training a model
@@ -78,39 +77,40 @@ for i =2:length(twin)
 end
 real_label_scaled(real_label_scaled==0) = REJECT;
 
-%         predict_comb=(predict_label~=REJECT);
-%         mask=zeros(size(predict_label));
-%         for i =6:length(twin)-5
-%             mask(i) = median(predict_comb(i-5:i+5,1));
-%         end
-%         predict_label_r_d=predict_label & mask;
-
-%         for i =6:length(twin)-5
-%             predict_label_r_d(i) = median(predict_label(i-5:i+5,1));
-%         end
-filterSizePred=2;
+%filterSizePred=2;
 predict_label_temp=[predict_label(1:filterSizePred);predict_label;predict_label(end-(filterSizePred+1):end)];
 for i =1:length(twin)
     predict_label_r_d(i) = median(predict_label_temp(i:i+2*filterSizePred,1));
 end
 predict_label_r_d=[REJECT;predict_label_r_d(1:end-1)];
+
+%% visual laughter
+[timeStamp, ~, finalSmoothed] = CreateLaughterStreamFromFaceProps(file,featurePath,filterSizePred);
+
+
 %% Plots
-subplot(2,1,1);
+subplot(3,1,1);
 bar(twin,predict_label_r_d==LAUGHTER,'b','EdgeColor','None');
 hold on;
 bar(twin,predict_label_r_d==BREATHING,'r','EdgeColor','None');
 
-title('Predicted');
+title('Audio Predicted');
 %line([step,step],[0,1],'LineWidth',2,'Color','g');
 hold off;
 
-subplot(2,1,2);
+subplot(3,1,2);
 bar(twin,real_label_scaled==LAUGHTER,'b','EdgeColor','None');
 hold on
 bar(twin,real_label_scaled==BREATHING,'r','EdgeColor','None');
 title('Real');
 %line([step,step],[0,1],'LineWidth',2,'Color','g');
 hold off;
+
+subplot(3,1,3);
+bar(timeStamp,finalSmoothed,'b','EdgeColor','None');
+xlim([0 (floor(timeStamp(end)/10)+1)*10]);
+title('Visual predicted');
+%line([step,step],[0,1],'LineWidth',2,'Color','g');
 drawnow;
 
 videoFile=[audioPath(1:end-31) 'video' audioPath(end-25:end-4) '.mp4'];
@@ -133,22 +133,22 @@ x=0;
 for k=1:readObj.NumberOfFrames
     %[I, AUDIO] = step(videoFReader);
     I = read(readObj, k);
-    subplot(5,1,[1,2,3]);
+    subplot(6,1,[1,2,3]);
     imshow(I);
     
     x=x+1/readObj.FrameRate;
     step=min(twin(x<twin));
     
-    subplot(5,1,4);
+    subplot(6,1,4);
     bar(twin,predict_label_r_d==LAUGHTER,'b','EdgeColor','None');
     hold on;
     bar(twin,predict_label_r_d==BREATHING,'r','EdgeColor','None');
-    title('Predicted');hold on;
+    title('Audio Predicted');hold on;
     if(~isempty(step))
     line([step,step],[0,1],'LineWidth',2,'Color','green');
     end
     hold off;
-    subplot(5,1,5);
+    subplot(6,1,5);
     bar(twin,real_label_scaled==LAUGHTER,'b','EdgeColor','None');
     hold on
     bar(twin,real_label_scaled==BREATHING,'r','EdgeColor','None');
@@ -157,6 +157,16 @@ for k=1:readObj.NumberOfFrames
     line([step,step],[0,1],'LineWidth',2,'Color','green');
     end
     hold off;
+    
+    subplot(6,1,6);
+    bar(timeStamp,finalSmoothed,'b','EdgeColor','None');
+    xlim([0 (floor(timeStamp(end)/10)+1)*10]);
+    title('Visual predicted');
+    if(~isempty(step))
+    line([step,step],[0,1],'LineWidth',2,'Color','green');
+    end
+    hold off;
+    
     drawnow;
     M=getframe(gcf);
     %step(videoFWriter,I,AUDIO);
