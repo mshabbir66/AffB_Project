@@ -65,7 +65,7 @@ labelmap('REJECT') = REJECT;
 
 real_label = GenerateAffectBurstLabelsForSingleFile(EmotionEvents,file,numberOfFrames,labelmap);
 
-figure(1);
+
 t=0:1/1000:length(real_label)/1000-1/1000;
 twin=0:shiftms/1000:length(real_label)/1000-shiftms/1000;
 real_label_scaled = zeros(size(predict_label));
@@ -84,15 +84,44 @@ for i =1:length(twin)
 end
 predict_label_r_d=[REJECT;predict_label_r_d(1:end-1)];
 
-%% visual laughter
-[timeStamp, ~, finalSmoothed] = CreateLaughterStreamFromFaceProps(file,featurePath,filterSizePred);
+% %% visual laughter
+% [timeStamp, ~, finalSmoothed] = CreateLaughterStreamFromFaceProps(file,featurePath,filterSizePred);
 
+%% visualize different combinations
+
+[timeStamp, final] = CreateStreamFromFaceProps(file,featurePath);
+final=(final(:,1)==3)&(final(:,6)==3)&((final(:,5)==3)|(final(:,4)==3));
+%final=(final(:,1)==3)&(final(:,6)==3);
+predict_label_temp=[final(1:filterSizePred);final;final(end-(filterSizePred+1):end)];
+finalSmoothed = zeros(size(final));
+for i =1:length(final)
+    finalSmoothed(i) = median(predict_label_temp(i:i+2*filterSizePred,1));
+end
+
+% figure;
+% subplot(2,1,1);
+% bar(timeStamp,finalSmoothed,'b','EdgeColor','None');
+% xlim([0 (floor(timeStamp(end)/10)+1)*10]);
+% title('happy and mouth open');
+% %line([step,step],[0,1],'LineWidth',2,'Color','g');
+% 
+% subplot(2,1,2);
+% bar(twin,real_label_scaled==LAUGHTER,'b','EdgeColor','None');
+% hold on
+% bar(twin,real_label_scaled==BREATHING,'r','EdgeColor','None');
+% xlim([0 (floor(timeStamp(end)/10)+1)*10]);
+% title('Real');
+% %line([step,step],[0,1],'LineWidth',2,'Color','g');
+% hold off;
+% drawnow;
 
 %% Plots
+figure;
 subplot(3,1,1);
 bar(twin,predict_label_r_d==LAUGHTER,'b','EdgeColor','None');
 hold on;
 bar(twin,predict_label_r_d==BREATHING,'r','EdgeColor','None');
+xlim([0 (floor(timeStamp(end)/10)+1)*10]);
 
 title('Audio Predicted');
 %line([step,step],[0,1],'LineWidth',2,'Color','g');
@@ -102,6 +131,7 @@ subplot(3,1,2);
 bar(twin,real_label_scaled==LAUGHTER,'b','EdgeColor','None');
 hold on
 bar(twin,real_label_scaled==BREATHING,'r','EdgeColor','None');
+xlim([0 (floor(timeStamp(end)/10)+1)*10]);
 title('Real');
 %line([step,step],[0,1],'LineWidth',2,'Color','g');
 hold off;
@@ -112,6 +142,8 @@ xlim([0 (floor(timeStamp(end)/10)+1)*10]);
 title('Visual predicted');
 %line([step,step],[0,1],'LineWidth',2,'Color','g');
 drawnow;
+
+%% video
 
 videoFile=[audioPath(1:end-31) 'video' audioPath(end-25:end-4) '.mp4'];
 
@@ -143,6 +175,7 @@ for k=1:readObj.NumberOfFrames
     bar(twin,predict_label_r_d==LAUGHTER,'b','EdgeColor','None');
     hold on;
     bar(twin,predict_label_r_d==BREATHING,'r','EdgeColor','None');
+    xlim([0 (floor(timeStamp(end)/10)+1)*10]);
     title('Audio Predicted');hold on;
     if(~isempty(step))
     line([step,step],[0,1],'LineWidth',2,'Color','green');
@@ -152,6 +185,7 @@ for k=1:readObj.NumberOfFrames
     bar(twin,real_label_scaled==LAUGHTER,'b','EdgeColor','None');
     hold on
     bar(twin,real_label_scaled==BREATHING,'r','EdgeColor','None');
+    xlim([0 (floor(timeStamp(end)/10)+1)*10]);
     title('Real');
     if(~isempty(step))
     line([step,step],[0,1],'LineWidth',2,'Color','green');
