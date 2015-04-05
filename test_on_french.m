@@ -32,7 +32,7 @@ file=audioPath(end-21:end-4);
 % 
 % [model, bestParam, grid ]= learn_on_trainingData(data, label, cRange, gRange, nfoldCV, 0);
 
-load('Misc\modelOfWholeSet.mat');
+load('Misc\AudioModelof2DBs.mat');
 
 %% testing a sequence
 
