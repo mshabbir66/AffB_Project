@@ -1,4 +1,4 @@
-function [ antiAffectBursts ] = CreateRndAntiAffB( count, sessions, affData, winSize )
+function [ antiAffectBursts ] = CreateRndAntiAffB( count, sessions, AffectBursts, winSize )
 %CREATERNDWÝN Summary of this function goes here
 %   count: number of windows to be produced
 %   sessions: session numbers array
@@ -13,7 +13,6 @@ for i=1:length(sessions)
     fileList{1,i}=ls(['..\Session',num2str(sessions(i)),'\dialog\wav\*.wav']);
 end
 
-load(affData);
 antiAffectBursts(count).type = [];
 for i = 1:count
     
