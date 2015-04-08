@@ -44,10 +44,10 @@ winShift = shiftms/1000*fs;
 
 
 numberOfFrames=length(y)*1000/fs;
-unseenMFCC.data = [];
+unseenMFCC = [];
 i=0;
 while winSize+ winShift*i < length(y)
-        unseenMFCC(end+1).data = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
+        unseenMFCC(end+1,1).data = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
         i  =i + 1;      
 end
 
