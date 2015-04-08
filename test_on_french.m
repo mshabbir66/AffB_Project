@@ -32,7 +32,7 @@ file=audioPath(end-21:end-4);
 % 
 % [model, bestParam, grid ]= learn_on_trainingData(data, label, cRange, gRange, nfoldCV, 0);
 
-load('Misc\AudioModelof2DBs.mat');
+load('Misc\AudioModelof2DBs_rejectAdded_DBnorm.mat');
 
 %% testing a sequence
 
@@ -44,12 +44,19 @@ winShift = shiftms/1000*fs;
 
 
 numberOfFrames=length(y)*1000/fs;
-unseenStats = [];
+unseenMFCC.data = [];
 i=0;
 while winSize+ winShift*i < length(y)
-        MFCCs = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
-        unseenStats(end+1,:) = extract_stats(MFCCs);
+        unseenMFCC(end+1).data = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
         i  =i + 1;      
+end
+
+% normalization
+addpath C:\Users\Berker\Documents\GitHub\SCE_project
+[ unseenMFCC ] = AudioSamplesMFCCNormalization( unseenMFCC );
+
+for i=1:size(unseenMFCC,1)
+    unseenStats(i,:) = extract_stats(unseenMFCC(i).data);
 end
 
 [predict_label, ~ , ~] = svmpredict(zeros(size(unseenStats,1),1), unseenStats, model);
