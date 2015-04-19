@@ -61,7 +61,7 @@ REJECT = 2;
 % 
 % 
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
-
+addpath C:\Users\Berker\Documents\GitHub\SCE_project
 load ./Dataset/AffectDataSync+sesNumber
 
 %% CV
@@ -77,13 +77,15 @@ label(strcmp(LABEL,'Breathing')) = BREATHING;
 label(strcmp(LABEL,'Other')) = OTHER;
 label(strcmp(LABEL,'REJECT')) = REJECT;
 
-datatemp=[];
-for i=1:length(AffectDataSync)
-    datatemp(i,:)=extract_stats(AffectDataSync(i).data);
-end
+% datatemp=[];
+% for i=1:length(AffectDataSync)
+%     datatemp(i,:)=extract_stats(AffectDataSync(i).data);
+% end
+
+%[ AffectDataSync ] = AudioSamplesMFCCNormalization( AffectDataSync );
 
 for i=1:length(AffectDataSync)
-    data(i,:)=[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
+    data(i,:)=extract_stats(AffectDataSync(i).data); %[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
 end
 
 
@@ -109,7 +111,7 @@ for k=1:4
 bestcv = 0;
 i =1; j =1;
 for log2c = -2:4:46,
-    for log2g = -14:1:-10,
+    for log2g = -20:1:-1,
 % for log2c = -2:4:34,
 %     for log2g = -13:1:-7,
 % for log2c = -2:4:34,

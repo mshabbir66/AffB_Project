@@ -1,4 +1,4 @@
-function [predict_label_r_d, real_label_scaled]=test_on_french(audioPath,EmotionEvents,featurePath,filterSizePred)
+function [predict_label_r_d, real_label_scaled]=test_on_french(audioPath,EmotionEvents,featurePath,medianSize)
 
 LAUGHTER = 1;
 BREATHING = 2;
@@ -42,6 +42,8 @@ shiftms = 250;
 winSize  = winms/1000*fs;
 winShift = shiftms/1000*fs;
 
+addpath C:\Users\Berker\Documents\GitHub\SCE_project
+addpath C:\Users\Berker\Documents\GitHub\SCE_project\PNCC
 
 numberOfFrames=length(y)*1000/fs;
 unseenMFCC = [];
@@ -52,7 +54,7 @@ while winSize+ winShift*i < length(y)
 end
 
 % normalization
-addpath C:\Users\Berker\Documents\GitHub\SCE_project
+
 [ unseenMFCC ] = AudioSamplesMFCCNormalization( unseenMFCC );
 
 for i=1:size(unseenMFCC,1)
@@ -85,11 +87,14 @@ end
 real_label_scaled(real_label_scaled==0) = REJECT;
 
 %filterSizePred=2;
-predict_label_temp=[predict_label(1:filterSizePred);predict_label;predict_label(end-(filterSizePred+1):end)];
+predict_label_temp=[predict_label(1:medianSize);predict_label;predict_label(end-(medianSize+1):end)];
 for i =1:length(twin)
-    predict_label_r_d(i) = median(predict_label_temp(i:i+2*filterSizePred,1));
+    predict_label_r_d(i) = median(predict_label_temp(i:i+2*medianSize,1));
 end
 predict_label_r_d=[REJECT;predict_label_r_d(1:end-1)];
+
+[predict_label_r_d,~] = DilationErosionFilter(predict_label_r_d==LAUGHTER, 3,3);
+[predict_label_r_d,~] = ErosionDilationFilter(predict_label_r_d, 3,3);
 
 % %% visual laughter
 % [timeStamp, ~, finalSmoothed] = CreateLaughterStreamFromFaceProps(file,featurePath,filterSizePred);
@@ -97,13 +102,16 @@ predict_label_r_d=[REJECT;predict_label_r_d(1:end-1)];
 %% visualize different combinations
 
 [timeStamp, final] = CreateStreamFromFaceProps(file,featurePath);
-final=(final(:,1)==3)&(final(:,6)==3)&((final(:,5)==3)|(final(:,4)==3));
-%final=(final(:,1)==3)&(final(:,6)==3);
-predict_label_temp=[final(1:filterSizePred);final;final(end-(filterSizePred+1):end)];
+%final=(final(:,1)==3)&(final(:,6)==3)&((final(:,5)==3)|(final(:,4)==3));
+final=(final(:,1)==3)&(final(:,6)==3);
+predict_label_temp=[final(1:medianSize);final;final(end-(medianSize+1):end)];
 finalSmoothed = zeros(size(final));
 for i =1:length(final)
-    finalSmoothed(i) = median(predict_label_temp(i:i+2*filterSizePred,1));
+    finalSmoothed(i) = median(predict_label_temp(i:i+2*medianSize,1));
 end
+
+[finalSmoothed,~] = DilationErosionFilter(finalSmoothed, 21,21);
+[finalSmoothed,~] = ErosionDilationFilter(finalSmoothed, 21,21);
 
 % figure;
 % subplot(2,1,1);
