@@ -20,10 +20,23 @@ addpath C:\Users\Berker\Documents\GitHub\SCE_project
 % [ AffectDataSyncMFCC ] = createAffectDataSync_onlyAudio_MFCC(AffectBursts,Affsoundseq,fs);
 % [ antiAffectDataSyncMFCC ] = createAffectDataSync_onlyAudio_MFCC(antiAffectBursts,antiAffsoundseq,fs);
 
-%%
-load Dataset/SILaughterData.mat
+load ('Dataset/SILaughterData.mat',...
+'randomIndex',...
+'AffectDataSyncMFCC',...
+'antiAffectDataSyncMFCC',...
+'AffectDataSyncPNCC',...
+'antiAffectDataSyncPNCC');
+
+%% MFCC segmented session out
 
 AffectDataSync=[AffectDataSyncMFCC;antiAffectDataSyncMFCC];
 AffectDataSync = AffectDataSync(randomIndex,:);
 
-[ConfusionMatrix]=AudioSessionOut(AffectDataSync);
+[ConfusionMatrixMFCC]=AudioSessionOut(AffectDataSync);
+
+%% PNCC segmented session out
+
+AffectDataSync=[AffectDataSyncPNCC;antiAffectDataSyncPNCC];
+AffectDataSync = AffectDataSync(randomIndex,:);
+
+[ConfusionMatrixPNCC]=AudioSessionOut(AffectDataSync);
