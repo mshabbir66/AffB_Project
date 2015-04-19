@@ -1,10 +1,4 @@
-% clc
-% close all
-% clear all
-% 
-% load AffectBurstsSession1234Cleaned
-% load antiAffectBursts
-Samples = antiAffectBursts'; %[AffectBursts;antiAffectBursts'];
+function soundseq=CreateAudioMat(Samples)
 
 soundseq(length(Samples)).data = [];
 
@@ -30,4 +24,5 @@ for i = 1:length(Samples)
     
 end
 
+end
 %save Dataset/soundseq.mat soundseq

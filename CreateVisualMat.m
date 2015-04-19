@@ -1,10 +1,5 @@
-% clc
-% close all
-% clear all
-% 
-% load AffectBurstsSession1234Cleaned
-% load antiAffectBursts
-Samples = antiAffectBursts'; %[AffectBursts;antiAffectBursts'];
+function visseq=CreateVisualMat(Samples)
+
 Vfs=120;
 
 visseq(length(Samples)).data = [];
@@ -38,5 +33,5 @@ for i = 1:length(Samples)
     disp(['done with ', num2str(i)]);
     
 end
-
+end
 %save Dataset/visseq.mat visseq
