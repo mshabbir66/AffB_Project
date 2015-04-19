@@ -26,7 +26,7 @@ for i = 1:count
     
     
     while(1) %overlap condition for randFile
-        startFrame=randi(length(y)-winSize*fs/1000,1);
+        startFrame=randi(floor(length(y)-winSize*fs/1000),1);
         endFrame=startFrame+winSize*fs/1000;
         if(~labels(round(startFrame*1000/fs)) |  ~labels(round(endFrame*1000/fs)) | ~labels(round(((startFrame+endFrame)/2)*1000/fs)))
             break;

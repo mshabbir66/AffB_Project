@@ -1,13 +1,9 @@
-function [ AffectDataSync ] = createAffectDataSync_plusheadpose
+function [ AffectDataSync ] = createAffectDataSync_onlyAudio_PNCC(Samples,soundseq,fs)
 %UNTÝTLED4 Summary of this function goes here
 %   Detailed explanation goes here
 
 addpath C:\Users\Berker\Documents\GitHub\SCE_project
 addpath C:\Users\Berker\Documents\GitHub\SCE_project\PNCC
-
-fs = 16000;
-Vfs = 120;
-K=12;
 
 winms=750; %in ms
 shiftms=250; %frame periodicity in ms
@@ -15,20 +11,13 @@ shiftms=250; %frame periodicity in ms
 winSize  = winms/1000*fs;
 winShift = shiftms/1000*fs;
 
-winSize3d  = winms/1000*Vfs;
-winShift3d = shiftms/1000*Vfs;
-
-load ./Dataset/antiAffectsoundseq.mat
-
-% load AffectBurstsSession1234Cleaned
-% load antiAffectBursts
-% load ./Dataset/soundseq.mat
-% load ./Dataset/visseq+head.mat
-% load PCA_ses1234.mat
-
-%Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
-Samples = antiAffectsoundseq;
-soundseq=antiAffectsoundseq;
+        if (fs~=16000)
+            for j=1:length(soundseq)
+                soundseq(j).data = resample(soundseq(j).data,16000,fs);
+            end
+            winSize  = winms/1000*16000;
+            winShift = shiftms/1000*16000;
+        end
 
 % Feature Extraction
 idcount=1;
@@ -46,13 +35,16 @@ for j  = 1:length(Samples)
 %         PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
 %         % PCAcoefDelta=deltas(PCAcoef',3)';
 %         AffectDataSync(end+1,:).data3d = [PCAcoef datamathead(:,1+winShift3d*i:winSize3d+winShift3d*i)'];%extract_stats(PCAcoef);
-%         
+
+
         MFCCs = ExtractPNCC(soundseq(j).data(1+winShift*i:winSize+winShift*i)');
         AffectDataSync(end+1,:).data = MFCCs;%extract_stats(MFCCs);
         
         AffectDataSync(end,:).id = idcount;
-        AffectDataSync(end,:).label = 'REJECT';%Samples(j).type;
-%         AffectDataSync(end,:).sesNumber = str2num(Samples(j).fileName(5));
+        AffectDataSync(end,:).label = Samples(j).type;
+        AffectDataSync(end,:).fileName = Samples(j).fileName;
+        AffectDataSync(end,:).sesNumber = str2num(Samples(j).fileName(5));
+        AffectDataSync(end,:).gender = Samples(j).fileName(6);
         i  =i + 1;
         
     end
