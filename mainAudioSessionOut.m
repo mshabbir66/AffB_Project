@@ -63,7 +63,7 @@ REJECT = 2;
 % save('./Dataset/AffectDataSync+sesNumber', 'AffectDataSync');
 addpath C:\Users\Berker\Documents\GitHub\SCE_project
 load ./Dataset/AffectDataSync+sesNumber
-load ./Dataset/AudioSamplesPNCC_IEMOCAP
+%load ./Dataset/AudioSamplesPNCC_IEMOCAP
 %% CV
 
 %addpath C:\Users\Shabbir\Desktop\libsvm-3.18\libsvm-3.18\matlab
@@ -73,9 +73,11 @@ AffectDataSync = AffectDataSync(ind,:);
 LABEL=extractfield(AffectDataSync,'label')';
 label = zeros(length(LABEL),1);
 label(strcmp(LABEL,'Laughter')) = LAUGHTER;
-label(strcmp(LABEL,'Breathing')) = BREATHING;
-label(strcmp(LABEL,'Other')) = OTHER;
+label(strcmp(LABEL,'Breathing')) = [];%BREATHING;
+label(strcmp(LABEL,'Other')) = [];%OTHER;
 label(strcmp(LABEL,'REJECT')) = REJECT;
+AffectDataSync(strcmp(LABEL,'Other')) = [];
+AffectDataSync(strcmp(LABEL,'Breathing')) = [];
 
 % datatemp=[];
 % for i=1:length(AffectDataSync)
