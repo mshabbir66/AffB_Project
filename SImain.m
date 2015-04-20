@@ -2,7 +2,7 @@
 
 clear all;clc;close all;
 addpath C:\Users\Berker\Documents\GitHub\SCE_project
-
+addpath C:\Users\HP\Documents\GitHub\SCE_project
 % %% preparing IEMOCAP data
 % load('AffectBurstsSession1234Cleaned.mat','AffectBursts');
 % AffectBursts=AffectBursts(strcmp(extractfield(AffectBursts,'type'),'Laughter'));
@@ -54,14 +54,14 @@ AffectDataSync = AffectDataSync(randomIndex,:);
 AffectDataSync=[AffectDataSyncMFCC;antiAffectDataSyncMFCC];
 AffectDataSync = AffectDataSync(randomIndex,:);
 
-[ConfusionMatrixMFCCspeakerOut]=AudioSpeakerOut(AffectDataSync);
+[ConfusionMatrixMFCCspeakerOut,acc]=AudioSpeakerOut(AffectDataSync);
 
 %% PNCC speaker out
 
 AffectDataSync=[AffectDataSyncPNCC;antiAffectDataSyncPNCC];
 AffectDataSync = AffectDataSync(randomIndex,:);
 
-[ConfusionMatrixPNCCspeakerOut]=AudioSpeakerOut(AffectDataSync);
+[ConfusionMatrixPNCCspeakerOut,acc]=AudioSpeakerOut(AffectDataSync);
 
 %% MFCC speaker out with AVLaughterCycle
 
@@ -92,4 +92,4 @@ AffectDataSync = AffectDataSync(randomIndexforAVlaughterCycle,:);
 
 load Dataset/SILaughterData_addition.mat
 
-[ConfusionMatrixMFCCspeakerOut]=AudioSpeakerOut(AffectDataSync);
+[ConfusionMatrixMFCCspeakerOut,acc]=AudioSpeakerOut(AffectDataSync);

@@ -1,4 +1,4 @@
-function [ConfusionMatrix]=AudioSessionOut(AffectDataSync)
+function [ConfusionMatrix,acc]=AudioSessionOut(AffectDataSync)
 
 nfoldCV=3;
 %enum{
@@ -14,8 +14,9 @@ label(strcmp(LABEL,'Laughter')) = LAUGHTER;
 label(strcmp(LABEL,'REJECT')) = REJECT;
 
 
-for i=1:length(AffectDataSync)
+parfor i=1:length(AffectDataSync)
     data(i,:)=extract_stats(AffectDataSync(i).data); %[datatemp(i,:) extract_stats(AffectDataSync(i).data3d)];
+    disp(['Extracted stats for sample ', num2str(i)]);
 end
 
 
