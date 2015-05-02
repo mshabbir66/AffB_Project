@@ -38,14 +38,14 @@ cnt=0;
 genCode=['M','F'];
 for k=unique(temp)
     for l=1:2
-        cnt=cnt+1;
+        
         mask =(temp==k)&strcmp(gender,genCode(l));
         testData=data(mask,:);
         testLabel=label(mask);
         if(isempty(testLabel))
             continue;
         end
-
+        cnt=cnt+1;
         trainData=data(~mask,:);
         trainLabel=label(~mask);
 
