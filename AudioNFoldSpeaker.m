@@ -29,39 +29,66 @@ gRange=[-15 1 -9];
 
 % %% Leave one Session out test
 % 
-sesNum=extractfield(AffectDataSync,'sesNumber');
+temp=extractfield(AffectDataSync,'sesNumber');
 gender=extractfield(AffectDataSync,'gender');
-for i=1:length(sesNum)
-temp(i)=sesNum{i};
+for i=1:length(temp)
+sesNum(i)=temp{i};
 end
 
 cnt=0;
 genCode=['M','F'];
-for k=unique(temp)
+sessionList=unique(sesNum);
+rand_ind = randperm(length(sessionList));
+sessionList=sessionList(rand_ind);
+for k=sessionList
     for l=1:2
-        
-        mask =(temp==k)&strcmp(gender,genCode(l));
-        testData=data(mask,:);
-        testLabel=label(mask);
-        if(isempty(testLabel))
+        mask =(sesNum==k)&strcmp(gender,genCode(l));
+        if(sum(mask)==0)
             continue;
         end
         cnt=cnt+1;
-        trainData=data(~mask,:);
-        trainLabel=label(~mask);
+        for i=1:length(mask)
+            if(mask(i))
+            AffectDataSync(i).speaker=cnt;
+            end
+        end
+    end
+end
 
+speakers=unique(extractfield(AffectDataSync,'speaker'));
+len=length(speakers);
+load speakerrand %rand_ind = randperm(len);
+rand_id=speakers(rand_ind);
+for i=1:nfold % nfold test
+  train_ind=[];test_ind=[];
+  test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
+  train_id = rand_id;
+  train_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]) = [];
+        
+  for k=1:length(train_id)
+      train_ind=[train_ind;find(extractfield(AffectDataSync,'speaker')==train_id(k))'];
+  end
+  trainData=data(train_ind,:);
+  trainLabel=label(train_ind);
+  
+  for k=1:length(test_id)
+      test_ind=[test_ind;find(extractfield(AffectDataSync,'speaker')==test_id(k))'];
+  end
+  testData=data(test_ind,:);
+  testLabel=label(test_ind);
+        
 
         [ model, bestParam, cv ] = learn_on_trainingData(trainData, trainLabel, cRange, gRange, nfoldCV, 0 );
 
 
         [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
 
-        acc(cnt).accuracy=accuracy(1);
-        acc(cnt).testLabel = testLabel;
-        acc(cnt).predict_label = predict_label;
-
-        disp(['done with ', num2str(cnt)]);
-    end
+        acc(i).accuracy=accuracy(1);
+        acc(i).testLabel = testLabel;
+        acc(i).predict_label = predict_label;
+        acc(i).speakers=test_id;
+        disp(['done with ', num2str(i)]);
+   
 end
 
 
