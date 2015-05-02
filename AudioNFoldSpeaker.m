@@ -1,7 +1,7 @@
-function [ConfusionMatrix,acc]=AudioNFoldSpeaker(AffectDataSync)
+function [ConfusionMatrix,acc]=AudioNFoldSpeaker(AffectDataSync,nfold)
 
 nfoldCV=3;
-nfold=3;
+
 %enum{
 LAUGHTER = 1;
 REJECT = 2;
