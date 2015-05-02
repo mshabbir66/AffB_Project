@@ -1,4 +1,4 @@
-function [ConfusionMatrix,acc]=AudioSessionOut(AffectDataSync)
+function [ConfusionMatrix,acc]=AudiSpeakerOut(AffectDataSync)
 
 nfoldCV=3;
 %enum{
