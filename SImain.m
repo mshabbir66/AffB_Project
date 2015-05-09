@@ -92,4 +92,6 @@ AffectDataSync = AffectDataSync(randomIndexforAVlaughterCycle,:);
 
 load Dataset/SILaughterData_addition.mat
 
-[ConfusionMatrixMFCCspeakerOut,acc]=AudioNFoldSpeaker(AffectDataSync,5);
+[ConfusionMatrixMFCCspeakerOut_IEMOCAP,acc]=AudioNFoldSpeaker(AffectDataSync,5);
+
+[ConfusionMatrix,acc]=SITestSessionClipsOut(AffectDataSync,5);

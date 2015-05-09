@@ -31,9 +31,10 @@ gRange=[-15 1 -9];
 % 
 temp=extractfield(AffectDataSync,'sesNumber');
 gender=extractfield(AffectDataSync,'gender');
-for i=1:length(temp)
-sesNum(i)=temp{i};
-end
+% for i=1:length(temp)
+% sesNum(i)=temp{i};
+% end
+sesNum=temp;
 
 cnt=0;
 genCode=['M','F'];
@@ -57,8 +58,10 @@ end
 
 speakers=unique(extractfield(AffectDataSync,'speaker'));
 len=length(speakers);
-load speakerrand %rand_ind = randperm(len);
+%load speakerrand
+rand_ind = randperm(len);
 rand_id=speakers(rand_ind);
+acc(nfold).accuracy=[];
 for i=1:nfold % nfold test
   train_ind=[];test_ind=[];
   test_id=rand_id([floor((i-1)*len/nfold)+1:floor(i*len/nfold)]');
