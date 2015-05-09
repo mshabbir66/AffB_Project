@@ -3,9 +3,9 @@ clc
 close all
 
 addpath C:\Users\Berker\Documents\GitHub\SCE_project
-videoFile='Ses05F_impro01.avi';
+videoFile='Ses05M_impro03.avi';
 videoFile=['D:\JOKER\Databases\IEMOCAP\Session5\dialog\avi\DivX\' videoFile]; 
-audioPath='D:\JOKER\Databases\IEMOCAP\Session5\dialog\wav\Ses05F_impro01.wav';
+audioPath='D:\JOKER\Databases\IEMOCAP\Session5\dialog\wav\Ses05M_impro03.wav';
 file=audioPath(end-17:end-4);
 
 medianSize=0;
@@ -18,6 +18,7 @@ BREATHING = 3;
 REJECT = 2;
 
 [y,fs] = wavread(audioPath);
+y=y(:,2);
 winms = 750;
 shiftms = 250;
 winSize  = winms/1000*fs;
@@ -64,11 +65,12 @@ for i =2:length(twin)
 end
 real_label_scaled(real_label_scaled==0) = REJECT;
 
-%filterSizePred=2;
-predict_label_temp=[predict_label(1:medianSize);predict_label;predict_label(end-(medianSize+1):end)];
-for i =1:length(twin)
-    predict_label_r_d(i) = median(predict_label_temp(i:i+2*medianSize,1));
-end
+% %filterSizePred=2;
+% predict_label_temp=[predict_label(1:medianSize);predict_label;predict_label(end-(medianSize+1):end)];
+% for i =1:length(twin)
+%     predict_label_r_d(i) = median(predict_label_temp(i:i+2*medianSize,1));
+% end
+predict_label_r_d=predict_label;
 predict_label_r_d=[REJECT;predict_label_r_d(1:end-1)];
 
 %[predict_label_r_d,~] = DilationErosionFilter(predict_label_r_d==LAUGHTER, 3,3);
