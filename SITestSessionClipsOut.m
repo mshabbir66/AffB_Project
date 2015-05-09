@@ -104,6 +104,8 @@ for k=1:sessions % Cross training : folding
         %% ground truth compare
         labelmap = containers.Map;
         labelmap('Laughter') = LAUGHTER;
+        labelmap('Breathing') = REJECT;
+        labelmap('Other') = REJECT;
         labelmap('REJECT') = REJECT;
 
         AffAnno=Aff.AffectBursts(strcmp(extractfield(Aff.AffectBursts,'fileName'),fileName));
@@ -141,7 +143,7 @@ for k=1:sessions % Cross training : folding
         predict_label_r_d=[REJECT;predict_label_r_d(1:end-1)];
         
         %% Plots
-        figure(count);
+        figure(1);
         subplot(2,1,1);
         bar(twin,predict_label_r_d==LAUGHTER,'b','EdgeColor','None');
         title('Predicted');
