@@ -75,41 +75,35 @@ for k=1:sessions % Cross training : folding
                 y = y(:,2);
         end
 
-        fidv = fopen(['../Session',fileName(5),'/dialog/MOCAP_rotated/',fileName ,'.txt'],'r');
-        text=textscan(fidv,'%d %f %s','Delimiter','\n','Headerlines',2);
-        fclose(fidv);
 
-        datamat=zeros(165,size(text{1,3},1));
-        for i=1:size(text{1,3},1)
-            datamat(:,i)=str2double(strsplit(text{1,3}{i}))';
-        end
+
 
         numberOfFrames=length(y)*1000/fs;
         unseenStats = [];
+        unseenMFCC = [];
         i=0;
         count=count+1;
-        while winSize+ winShift*i < length(y) & winSize3d+ winShift3d*i < size(text{1,3},1)
-            PCAcoef = ExtractPCA(datamat(:,1+winShift3d*i:winSize3d+winShift3d*i),U,pcaWmean,K);
-            MFCCs = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
-            clipStats(count).audio(end+1,:)=extract_stats(MFCCs); 
-            clipStats(count).visual(end+1,:)=extract_stats(PCAcoef);
+        while winSize+ winShift*i < length(y)
+            unseenMFCC(end+1,1).data = ExtractMFCC(y(1+winShift*i:winSize+ winShift*i),fs);
             i = i + 1;
         end
-        if ((winSize3d+ winShift3d*i < size(text{1,3},1))==0)
-            numberOfFrames = length(y(1:winSize+ winShift*(i-1)))*1000/fs;
-            y =y(1:winSize+ winShift*(i-1));
+        
+        % normalization
+        [ unseenMFCC ] = AudioSamplesMFCCNormalization( unseenMFCC );
+        
+        for i=1:size(unseenMFCC,1)
+            unseenStats(i,:) = extract_stats(unseenMFCC(i).data);
         end
+        
+        clipStats(count).audio=unseenStats;
         clipStats(count).fileName=fileName;
-        % feature fusion
-        unseenStats=[clipStats(count).audio clipStats(count).visual];
+        
         
         [predict_label, ~ ,prob_values] = svmpredict(zeros(size(unseenStats,1),1), unseenStats, model);
 
         %% ground truth compare
         labelmap = containers.Map;
         labelmap('Laughter') = LAUGHTER;
-        labelmap('Breathing') = BREATHING;
-        labelmap('Other') = OTHER;
         labelmap('REJECT') = REJECT;
 
         AffAnno=Aff.AffectBursts(strcmp(extractfield(Aff.AffectBursts,'fileName'),fileName));
@@ -138,11 +132,14 @@ for k=1:sessions % Cross training : folding
 %             predict_label_r_d(i) = median(predict_label(i-5:i+5,1));
 %         end
 
-        predict_label_temp=[predict_label(1:5);predict_label;predict_label(end-6:end)];
-        for i =1:length(twin)
-            predict_label_r_d(i) = median(predict_label_temp(i:i+10,1));
-        end
 
+        medianSize=0;
+        predict_label_temp=[predict_label(1:medianSize);predict_label;predict_label(end-(medianSize+1):end)];
+        for i =1:length(twin)
+            predict_label_r_d(i) = median(predict_label_temp(i:i+2*medianSize,1));
+        end
+        predict_label_r_d=[REJECT;predict_label_r_d(1:end-1)];
+        
         %% Plots
         figure(count);
         subplot(2,1,1);
