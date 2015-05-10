@@ -110,7 +110,7 @@ for k=1:sessions % Cross training : folding
 
         AffAnno=Aff.AffectBursts(strcmp(extractfield(Aff.AffectBursts,'fileName'),fileName));
 
-        real_label = GenerateAffectBurstLabelsForSingleFile(AffAnno,fileName,numberOfFrames,labelmap);
+        real_label = GenerateAffectBurstLabelsForSingleFile(AffAnno,fileName,int32(numberOfFrames),labelmap);
         
         t=0:1/1000:length(real_label)/1000-1/1000;
         twin=0:shiftms/1000:length(real_label)/1000-shiftms/1000;
