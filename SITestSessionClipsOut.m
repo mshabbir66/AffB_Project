@@ -118,6 +118,7 @@ for k=1:sessions % Cross training : folding
         predict_label_r_d = zeros(size(predict_label));
 
         twin=twin(2:end-1);
+        twin=twin';
         for i =2:length(twin)
             real_label_scaled(i) = median(double(real_label((t < twin(i)) & (t > twin(i-1)))));
         end
@@ -145,13 +146,13 @@ for k=1:sessions % Cross training : folding
         %% Plots
         figure(1);
         subplot(2,1,1);
-        bar(twin,predict_label_r_d==LAUGHTER,'b','EdgeColor','None');
+        bar(twin,int32(predict_label_r_d==LAUGHTER),'b','EdgeColor','None');
         title('Predicted');
         %line([step,step],[0,1],'LineWidth',2,'Color','g');
 
 
         subplot(2,1,2);
-        bar(twin,real_label_scaled==LAUGHTER,'b','EdgeColor','None');
+        bar(twin,int32(real_label_scaled==LAUGHTER),'b','EdgeColor','None');
         title('Real');
         %line([step,step],[0,1],'LineWidth',2,'Color','g');
         drawnow;
