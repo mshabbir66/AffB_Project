@@ -59,7 +59,6 @@ for k=1:sessions % Cross training : folding
     [model, bestParam, grid ]= learn_on_trainingData(data, label, cRange, gRange, nfoldCV, 0);
 
     %% test
-
     for j=1:length(testFiles)
         fileName = testFiles(j).name(1:end-4);
         [y,fs] = wavread(['..\Session',fileName(5),'\dialog\wav\',fileName,'.wav']);
@@ -74,9 +73,6 @@ for k=1:sessions % Cross training : folding
             case 4
                 y = y(:,2);
         end
-
-
-
 
         numberOfFrames=length(y)*1000/fs;
         unseenStats = [];
@@ -160,7 +156,6 @@ for k=1:sessions % Cross training : folding
 
         predictLabels=[predictLabels;predict_label_r_d];
         realLabels=[realLabels;real_label_scaled];
-        duration=[duration length(twin)];
         
         acc(count).fileName=fileName;
         acc(count).realLabel = real_label_scaled;
