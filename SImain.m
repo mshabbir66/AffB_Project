@@ -94,4 +94,4 @@ load Dataset/SILaughterData_addition.mat
 
 %[ConfusionMatrixMFCCspeakerOut_IEMOCAP,acc]=AudioNFoldSpeaker(AffectDataSync,5);
 
-[ConfusionMatrixSessionClipsOut,acc]=SITestSessionClipsOut(AffectDataSync,4);
+[ConfusionMatrixSessionClipsOut,acc,4SesClipMFCC_notNormalized]=SITestSessionClipsOut(AffectDataSync,4,1);

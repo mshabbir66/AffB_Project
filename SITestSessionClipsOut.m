@@ -1,4 +1,4 @@
-function [ConfusionMatrix,acc]=SITestSessionClipsOut(AffectDataSyncBase,sessions);
+function [ConfusionMatrix,acc,clipMFCC]=SITestSessionClipsOut(AffectDataSyncBase,sessions,isnorm);
 
 fs = 16000;
 Aff=load('AffectBurstsSession1234Cleaned');
@@ -28,13 +28,13 @@ end
 len=length(files);
 %% 
 predictLabels=[]; realLabels=[];
-clipStats(len).audio=[];
+clipMFCC(len).data=[];
 count=0;
 acc(sessions).testLabel=[];
 for k=1:sessions % Cross training : folding
     
     testFiles=dir(['../Session' num2str(k) '/dialog/wav']);
-    testFiles=file(3:end,:);
+    testFiles=testFiles(3:end,:);
 
     AffectDataSync=AffectDataSyncBase;
 
@@ -88,15 +88,16 @@ for k=1:sessions % Cross training : folding
             i = i + 1;
         end
         
-        % normalization
-        [ unseenMFCC ] = AudioSamplesMFCCNormalization( unseenMFCC );
+        clipMFCC(count).data=unseenMFCC;
+        clipMFCC(count).fileName=fileName;
         
-        for i=1:size(unseenMFCC,1)
-            unseenStats(i,:) = extract_stats(unseenMFCC(i).data);
+        if(isnorm)
+            [ unseenMFCC ] = AudioSamplesMFCCNormalization( unseenMFCC );
         end
         
-        clipStats(count).audio=unseenStats;
-        clipStats(count).fileName=fileName;
+        parfor i=1:size(unseenMFCC,1)
+            unseenStats(i,:) = extract_stats(unseenMFCC(i).data);
+        end
         
         
         [predict_label, ~ ,prob_values] = svmpredict(zeros(size(unseenStats,1),1), unseenStats, model);
