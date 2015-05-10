@@ -30,7 +30,7 @@ len=length(files);
 predictLabels=[]; realLabels=[];
 clipMFCC(len).data=[];
 count=0;
-acc(sessions).testLabel=[];
+acc(len).realLabel=[];
 for k=1:sessions % Cross training : folding
     
     testFiles=dir(['../Session' num2str(k) '/dialog/wav']);
@@ -160,12 +160,16 @@ for k=1:sessions % Cross training : folding
 
         predictLabels=[predictLabels;predict_label_r_d];
         realLabels=[realLabels;real_label_scaled];
-
+        duration=[duration length(twin)];
+        
+        acc(count).fileName=fileName;
+        acc(count).realLabel = real_label_scaled;
+        acc(count).predictLabel = predict_label_r_d;
+        acc(count).duration=length(twin);
+        acc(count).fold=k;
+        
     end
-    acc(k).testFiles=testFiles;
-    acc(k).testLabel = realLabels;
-    acc(k).predict_label = predictLabels;
-    acc(k).session=k;
+    
     disp(['done fold ', num2str(k)]);
 end
 
