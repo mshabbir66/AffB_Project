@@ -19,7 +19,7 @@ winShift3d = shiftms/1000*Vfs;
 % load antiAffectBursts
 % load ./Dataset/soundseq.mat
 % load ./Dataset/visseq.mat
-load PCA_ses1234.mat
+% load PCA_ses1234.mat
 
 % %%%%%
 % load newantiAffectBursts
@@ -50,6 +50,7 @@ for j  = 1:length(Samples)
         AffectDataSync(end,:).label = Samples(j).type;
         AffectDataSync(end,:).sesNumber = str2num(Samples(j).fileName(5));
         AffectDataSync(end,:).fileName = Samples(j).fileName;
+        AffectDataSync(end,:).gender = Samples(j).fileName(6);
         i  =i + 1;
         
     end

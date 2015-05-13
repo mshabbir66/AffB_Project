@@ -18,6 +18,8 @@ for i = 1:length(Samples)
             y = y(startFrame:endFrame,2);
         case 4
             y = y(startFrame:endFrame,2);
+        case 5
+        y = y(startFrame:endFrame,2);
     end  
     soundseq(i).data = y';
     disp(['done with ', num2str(i)]);
