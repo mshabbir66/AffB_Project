@@ -15,18 +15,19 @@ winSize3d  = winms/1000*Vfs;
 winShift3d = shiftms/1000*Vfs;
 
 
-% load AffectBurstsSession1234Cleaned
-% load antiAffectBursts
-% load ./Dataset/soundseq.mat
-% load ./Dataset/visseq.mat
-load PCA_ses1234.mat
+ %load AffectBurstsSession1234Cleaned
+ %load antiAffectBursts
+ load ./Dataset/soundseqP.mat
+ load ./Dataset/visseqP.mat
+ load PCA_ses1234.mat
+ load SamplesAffectsAntiAffects;
 
 % %%%%%
-% load newantiAffectBursts
-% Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2)-length(newantiAffectBursts))';newantiAffectBursts'];
+ %load newantiAffectBursts
+ %Samples = [AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2)-length(newantiAffectBursts))';newantiAffectBursts'];
 % %%%%%
 
-Samples = antiAffectBursts';%[AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
+%Samples = antiAffectBursts';%[AffectBursts;antiAffectBursts(1:round(length(antiAffectBursts)/2))'];
 
 % Feature Extraction
 idcount=1;

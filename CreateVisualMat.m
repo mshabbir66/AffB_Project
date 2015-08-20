@@ -1,10 +1,12 @@
-% clc
-% close all
-% clear all
+ clc
+ close all
+ clear all
 % 
 % load AffectBurstsSession1234Cleaned
 % load antiAffectBursts
-Samples = antiAffectBursts'; %[AffectBursts;antiAffectBursts'];
+%Samples = antiAffectBursts'; %[AffectBursts;antiAffectBursts'];
+load SamplesAffectsAntiAffects;
+
 Vfs=120;
 
 visseq(length(Samples)).data = [];

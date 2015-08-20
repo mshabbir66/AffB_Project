@@ -2,6 +2,8 @@ clc
 close all
 clear all
 
+addpath(genpath('./libsvm-3.20'));
+
 nfoldCV=3;
 %enum{
 LAUGHTER = 1;
@@ -61,7 +63,7 @@ REJECT = 3;
 % 
 % save('./Dataset/AffectDataSync', 'AffectDataSync');
 
-load ./Dataset/AffectDataSync
+load ./Dataset/AffectDataSync+sesNumber
 
 %% CV
 
@@ -96,8 +98,11 @@ bestcv = 0;
 i =1; j =1;
 for log2c = -2:4:46,
     for log2g = -14:1:-10,
+        %cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g) ' -b 1'];
+        %cv(i,j) = get_cv_ac_bin_probabilistic(label, data, cmd, nfoldCV);
         cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
         cv(i,j) = get_cv_ac_bin(label, data, cmd, nfoldCV);
+
         if (cv(i,j) >= bestcv),
             bestcv = cv(i,j); bestc = 2^log2c; bestg = 2^log2g;
         end
@@ -111,7 +116,9 @@ imagesc(cv);
 %% #######################
 % % Train the SVM in one-vs-rest (OVR) mode
 % % #######################
- bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg)];
+ 
+%bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg) ' -b 1'];
+bestParam = ['-q -c ', num2str(bestc), ' -g ', num2str(bestg)];
 
 
 % 
@@ -126,11 +133,13 @@ parfor i=1:max(extractfield(AffectDataSync,'id'))
     trainLabel=label(extractfield(AffectDataSync,'id')~=i);
     
     model = svmtrain(trainLabel, trainData, bestParam);
+ %   [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model, ' -b 1');
     [predict_label, accuracy, prob_values] = svmpredict(testLabel, testData, model);
     
     acc(i).accuracy=accuracy(1);
     acc(i).testLabel = testLabel;
     acc(i).predict_label = predict_label;
+    acc(i).prob_values = prob_values;
     
     disp(['done with ', num2str(i)]);
 end
@@ -181,5 +190,5 @@ ylabel('P');
 % saveas(gcf, './EXP/RecognitionFused_1', 'fig');
 % save ./EXP/RecognitionFused_1
 
-saveas(gcf, './EXP/RecognitionFused_3class', 'fig');
-save ./EXP/RecognitionFused_3class
+%saveas(gcf, './EXP/RecognitionFused_3class', 'fig');
+%save ./EXP/RecognitionFused_3class

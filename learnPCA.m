@@ -2,6 +2,20 @@ clear all;clc;
 
 load Dataset/visseq.mat
 
+fileName = testFiles(j).name(1:end-4);
+[y,fs] = wavread(['..\Session',fileName(5),'\dialog\wav\',fileName,'.wav']);
+fidv = fopen(['../Session',fileName(5),'/dialog/MOCAP_rotated/',fileName,'.txt'],'r');
+
+visSeqRaw.data=textscan(fidv,'%d %f %s','Delimiter','\n','Headerlines',2);
+fclose(fidv);
+
+visSeq(length(visSeqRaw),1).data = [];
+
+visSeq.data = zeros(length(visSeqRaw.data{3}),165);
+for i = 1:length(visSeqRaw.data{3})
+    visSeq.data(i,:)  = str2double(strsplit(visSeqRaw.data{3}{i}));
+end
+
 
 
 W=[];
@@ -68,10 +82,10 @@ close all
 for i=1:n
     
     hold off
-plot3(S(1:3:end,i),S(2:3:end,i),S(3:3:end,i),'r.');
-axis equal
-hold on
-plot3(recS(1:3:end,i),recS(2:3:end,i),recS(3:3:end,i),'bO')
-pause(0.01)
+    plot3(S(1:3:end,i),S(2:3:end,i),S(3:3:end,i),'r.');
+    axis equal
+    hold on
+    plot3(recS(1:3:end,i),recS(2:3:end,i),recS(3:3:end,i),'bO')
+    pause(0.01)
 end
 %save('PCA_ses1234', 'U', 'pcaWmean');
